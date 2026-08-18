@@ -1,0 +1,6 @@
+# RolandERP
+User-agent: *
+Disallow: /application/
+Disallow: /system/
+Disallow: /install/
+Disallow: /modules/

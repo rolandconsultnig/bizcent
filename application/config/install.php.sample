@@ -1,0 +1,8 @@
+<?php
+/**
+ * Copy this file to install.php to run a fresh installer:
+ *   application/config/install.php
+ *
+ * The app will then show an install link until setup completes.
+ * Do not leave install.php in place on a live site after setup.
+ */

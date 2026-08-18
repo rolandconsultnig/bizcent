@@ -1,0 +1,39 @@
+# RolandERP — Apache front controller
+# Works in htdocs root (http://localhost/) and in a subfolder
+# (http://localhost/Bizcenter/). If every page 404s, uncomment RewriteBase
+# and set it to your folder, e.g. RewriteBase /Bizcenter/
+
+<IfModule mod_rewrite.c>
+    Options -MultiViews -Indexes
+    RewriteEngine On
+
+    # RewriteBase /
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php/$1 [QSA,L]
+</IfModule>
+
+<IfModule mod_php.c>
+    php_value upload_max_filesize 64M
+    php_value post_max_size 64M
+    php_value memory_limit 256M
+    php_value max_execution_time 300
+    php_value max_input_vars 3000
+</IfModule>
+
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 64M
+    php_value post_max_size 64M
+    php_value memory_limit 256M
+    php_value max_execution_time 300
+    php_value max_input_vars 3000
+</IfModule>
+
+<IfModule mod_php8.c>
+    php_value upload_max_filesize 64M
+    php_value post_max_size 64M
+    php_value memory_limit 256M
+    php_value max_execution_time 300
+    php_value max_input_vars 3000
+</IfModule>

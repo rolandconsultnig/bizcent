@@ -1,0 +1,23 @@
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Nn]otepad++/
+*~
+
+# IDE / Editor Files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# CodeIgniter Logs and Cache
+application/logs/log-*.php
+application/cache/*
+!application/cache/index.php
+!application/cache/index.html
+!application/cache/.gitkeep
