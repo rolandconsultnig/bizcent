@@ -855,12 +855,7 @@ class User extends Admin_Controller
                     }
                     $login_data['permission'] = $assigned;
                 } else {
-                    set_message('error', lang('assigned_to') . ' Field is required');
-                    if (empty($_SERVER['HTTP_REFERER'])) {
-                        redirect('admin/user/user_list');
-                    } else {
-                        redirect($_SERVER['HTTP_REFERER']);
-                    }
+                    $login_data['permission'] = 'all';
                 }
                 $this->user_model->_table_name = 'tbl_users'; // table name
                 $this->user_model->_primary_key = 'user_id'; // $id

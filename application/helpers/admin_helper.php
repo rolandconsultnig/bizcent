@@ -926,7 +926,7 @@ function get_permission($colL, $col, $permission_user, $permissionL = null, $tex
                 <div class="checkbox c-radio needsclick"><label class="needsclick">
                 <input id="" type="radio" name="permission" value="everyone"';
     if (!empty($permissionL) && $permissionL == 'all') {
-        $html .= 'checked 2';
+        $html .= 'checked';
     } elseif (empty($allow_permission) && empty($permissionL)) {
         $html .= 'checked';
     }
