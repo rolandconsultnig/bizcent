@@ -32,11 +32,11 @@
             var length_options = [10, 25, 50, 100];
             var length_options_names = [10, 25, 50, 100];
 
-            var tables_pagination_limit = <?= config_item('tables_pagination_limit') ?>;
-            if (tables_pagination_limit == '') {
+            var tables_pagination_limit = "<?= config_item('tables_pagination_limit') ?>";
+            if (!tables_pagination_limit || tables_pagination_limit == '') {
                 tables_pagination_limit = 10;
             }
-            tables_pagination_limit = parseFloat(tables_pagination_limit);
+            tables_pagination_limit = parseFloat(tables_pagination_limit) || 10;
 
             if ($.inArray(tables_pagination_limit, length_options) == -1) {
                 length_options.push(tables_pagination_limit);
