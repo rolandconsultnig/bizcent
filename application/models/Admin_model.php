@@ -255,23 +255,29 @@ GROUP BY tbl_goal_type.goal_type_id
     }
 
 
-    public
-    function get_lang()
+    public function get_lang()
     {
+        $lang = 'english';
         if ($this->session->userdata('lang')) {
-            return $this->session->userdata('lang');
+            $lang = $this->session->userdata('lang');
         } else {
             $user_id = $this->session->userdata('user_id');
             if (!empty($user_id)) {
-                $query = $this->db->select('language')->where('user_id', $this->session->userdata('user_id'))->get('tbl_account_details');
-                if ($query->num_rows() > 0) {
+                $query = $this->db->select('language')->where('user_id', $user_id)->get('tbl_account_details');
+                if ($query && $query->num_rows() > 0) {
                     $row = $query->row();
-                    return $row->language;
+                    if (!empty($row->language)) {
+                        $lang = $row->language;
+                    }
                 }
             } else {
-                return config_item('default_language');
+                $def = config_item('default_language');
+                if (!empty($def)) {
+                    $lang = $def;
+                }
             }
         }
+        return strtolower(trim($lang));
     }
 
     public

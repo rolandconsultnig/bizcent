@@ -52,7 +52,7 @@ class MY_Controller extends CI_Controller
         if (!is_array($files)) {
             $files = array();
         }
-        $lang_to_load = !empty($system_lang) ? $system_lang : 'english';
+        $lang_to_load = !empty($system_lang) ? strtolower(trim($system_lang)) : 'english';
         foreach ($files as $file => $altpath) {
             $shortfile = str_replace("_lang.php", "", $file);
             $this->lang->load($shortfile, $lang_to_load);
