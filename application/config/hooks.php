@@ -9,11 +9,13 @@
 |	http://codeigniter.com/user_guide/general/hooks.html
 |
 */
-function hooks()
-{
-    global $hooks;
-    
-    return $hooks;
+if (!function_exists('hooks')) {
+    function hooks()
+    {
+        global $hooks;
+        
+        return $hooks;
+    }
 }
 
 //$hook['display_override'][] = array(

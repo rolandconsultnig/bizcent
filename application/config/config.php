@@ -10,19 +10,21 @@ spl_autoload_register(function ($classname) {
     }
 });
 
-function guess_base_url()
-{
-    $https = !empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off';
-    if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string) $_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') {
-        $https = true;
+if (!function_exists('guess_base_url')) {
+    function guess_base_url()
+    {
+        $https = !empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off';
+        if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string) $_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') {
+            $https = true;
+        }
+        $scheme = $https ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
+        $script = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? '/index.php'));
+        $dir = rtrim(str_replace(basename($script), '', $script), '/');
+        $base_url = $scheme . '://' . $host . $dir . '/';
+        $base_url = preg_replace('#/install/?$#', '/', $base_url);
+        return $base_url;
     }
-    $scheme = $https ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
-    $script = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? '/index.php'));
-    $dir = rtrim(str_replace(basename($script), '', $script), '/');
-    $base_url = $scheme . '://' . $host . $dir . '/';
-    $base_url = preg_replace('#/install/?$#', '/', $base_url);
-    return $base_url;
 }
 
 if (file_exists(APPPATH . 'config/install.php')) {
