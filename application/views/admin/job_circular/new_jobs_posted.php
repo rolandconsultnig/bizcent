@@ -12,6 +12,7 @@
                   echo $job_posted->job_circular_id;
               }
               ?>" method="post" class="form-horizontal form-groups-bordered">
+            <input type="hidden" name="job_circular_id" value="<?php if (!empty($job_posted->job_circular_id)) { echo $job_posted->job_circular_id; } ?>">
             <div class="form-group" id="border-none">
                 <label for="field-1" class="col-sm-3 control-label"><?= lang('job_title') ?><span
                         class="required"> *</span></label>
