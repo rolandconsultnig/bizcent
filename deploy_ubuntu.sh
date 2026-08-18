@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# ROLANDERP / BIZCENTER - ROBUST UBUNTU SERVER DEPLOYMENT SCRIPT
+# ROLANDERP / BIZCENTER - UBUNTU PRODUCTION SERVER DEPLOYMENT SCRIPT (PORT 2030)
 # Supports: Ubuntu 20.04 (Focal), 22.04 (Jammy), 24.04 (Noble), & Dev Releases
 # ==============================================================================
 
@@ -11,16 +11,17 @@ APP_DIR="/var/www/bizcenter"
 DB_NAME="db_saas_module"
 DB_USER="bizcenter_user"
 DB_PASS="BizCenter@2026!Secure"
-DOMAIN_OR_IP="${1:-localhost}"
+PORT=2030
+DOMAIN_OR_IP="${1:-$(curl -s ifconfig.me || echo 'localhost')}"
 
 echo "================================================================="
-echo "  🚀 Starting RolandERP / Bizcenter Ubuntu Deployment"
-echo "  Target Domain/IP: $DOMAIN_OR_IP"
+echo "  🚀 Starting RolandERP / Bizcenter Ubuntu Deployment (Port $PORT)"
+echo "  Target URL: http://$DOMAIN_OR_IP:$PORT"
 echo "================================================================="
 
-# Aggressively remove any broken ondrej PPA entries from deb822 (.sources) and traditional (.list)
+# Clean any broken third-party PPAs first
 echo "🧹 Cleaning broken PPA repositories..."
-sudo rm -f /etc/apt/sources.list.d/*ondrej* 2>/dev/null || true
+sudo rm -f /etc/apt/sources.list.d/*ondrej* /etc/apt/sources.list.d/ppa_ondrej* 2>/dev/null || true
 sudo sed -i '/ondrej/d' /etc/apt/sources.list 2>/dev/null || true
 if [ -d "/etc/apt/sources.list.d" ]; then
     sudo grep -l "ondrej" /etc/apt/sources.list.d/* 2>/dev/null | xargs -r sudo rm -f || true
@@ -28,9 +29,9 @@ fi
 
 # 1. Update Packages
 echo "📦 Step 1: Updating system package index..."
-sudo apt update -y
+sudo apt clean && sudo apt update -y
 
-# 2. Detect and Install PHP & Extensions directly from Ubuntu official repository
+# 2. Detect and Install PHP & Extensions
 echo "📦 Step 2: Installing Nginx, MySQL Server, and PHP..."
 sudo apt install -y nginx mysql-server php php-fpm php-mysql php-curl php-gd php-mbstring php-xml php-zip php-intl php-bcmath php-soap git unzip curl
 
@@ -104,12 +105,12 @@ $db['default'] = array(
 );
 EOF
 
-# 8. Configure Nginx Virtual Host
-echo "🌐 Step 7: Configuring Nginx virtual host..."
+# 8. Configure Nginx Virtual Host on Port 2030
+echo "🌐 Step 7: Configuring Nginx virtual host on port $PORT..."
 sudo tee /etc/nginx/sites-available/bizcenter > /dev/null << EOF
 server {
-    listen 80;
-    server_name $DOMAIN_OR_IP;
+    listen $PORT;
+    server_name _;
     root $APP_DIR;
     index index.php index.html;
 
@@ -139,7 +140,14 @@ server {
 EOF
 
 sudo ln -sf /etc/nginx/sites-available/bizcenter /etc/nginx/sites-enabled/
-sudo rm -f /etc/nginx/sites-enabled/default
+sudo rm -f /etc/nginx/sites-enabled/default 2>/dev/null || true
+
+# Open firewall port 2030 if UFW is active
+if command -v ufw > /dev/null; then
+    echo "🛡️ Opening UFW firewall port $PORT..."
+    sudo ufw allow $PORT/tcp || true
+fi
+
 sudo nginx -t
 sudo systemctl restart php*-fpm || true
 sudo systemctl restart nginx
@@ -149,7 +157,7 @@ echo "⏱️ Step 8: Configuring system cron jobs..."
 (crontab -l 2>/dev/null | grep -v "$APP_DIR"; echo "* * * * * php $APP_DIR/index.php cron >/dev/null 2>&1") | crontab -
 
 echo "================================================================="
-echo "  ✅ RolandERP / Bizcenter is DEPLOYED & ONLINE!"
-echo "  🌐 URL: http://$DOMAIN_OR_IP"
+echo "  ✅ RolandERP / Bizcenter is DEPLOYED & ACTIVE on PORT $PORT!"
+echo "  🌐 URL: http://$DOMAIN_OR_IP:$PORT"
 echo "  🔑 Default Admin: admin / admin123"
 echo "================================================================="
