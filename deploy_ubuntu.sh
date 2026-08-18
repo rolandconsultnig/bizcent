@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# ROLANDERP / BIZCENTER - PRODUCTION DEPLOYMENT (/var/www/bitcent on PORT 2030)
+# ROLANDERP / BIZCENTER - PRODUCTION DEPLOYMENT (/var/www/bitcent on PORT 2035)
 # ==============================================================================
 
 set -e
@@ -9,7 +9,7 @@ APP_DIR="/var/www/bitcent"
 DB_NAME="db_saas_module"
 DB_USER="bizcenter_user"
 DB_PASS="BizCenter@2026!Secure"
-PORT=2030
+PORT=2035
 DOMAIN_OR_IP="${1:-$(curl -s ifconfig.me || echo 'localhost')}"
 
 echo "================================================================="
@@ -102,7 +102,7 @@ $db['default'] = array(
 );
 EOF
 
-# 7. Configure Nginx on Port 2030
+# 7. Configure Nginx on Port 2035
 echo "🌐 Step 7: Configuring Nginx on port $PORT..."
 sudo tee /etc/nginx/sites-available/bitcent > /dev/null << EOF
 server {
@@ -139,7 +139,7 @@ EOF
 sudo ln -sf /etc/nginx/sites-available/bitcent /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-enabled/bizcenter 2>/dev/null || true
 
-# Open Firewall Port
+# Open Firewall Port 2035
 if command -v ufw > /dev/null; then
     sudo ufw allow $PORT/tcp || true
 fi
