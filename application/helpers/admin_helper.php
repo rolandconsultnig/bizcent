@@ -4612,3 +4612,30 @@ function get_sales_currency($sales_info)
     $currency = apply_filters('sales_currency', $sales_info);
     return $currency;
 }
+
+function clean_job_html($html)
+{
+    if (empty($html)) {
+        return '';
+    }
+    // 1. Decode entities if pasted escaped
+    $html = html_entity_decode($html, ENT_QUOTES, 'UTF-8');
+    // 2. Strip all Word conditional comments
+    $html = preg_replace('/<!--\[if[^>]*>[\s\S]*?<!\[endif\]-->/i', '', $html);
+    $html = preg_replace('/<!--\[if[^>]*-->/i', '', $html);
+    $html = preg_replace('/<!--\[endif\]-->/i', '', $html);
+    $html = preg_replace('/<!--[\s\S]*?-->/s', '', $html);
+    $html = preg_replace('/<!\[endif\]-->/i', '', $html);
+    $html = preg_replace('/<!--\[if[^\]]*\]/i', '', $html);
+    // 3. Remove Word specific XML tags <o:p>...</o:p>, <w:*>...</w:*>
+    $html = preg_replace('/<\/?(o|w|v|x|p):[^>]*>/i', '', $html);
+    $html = preg_replace('/style=([\'"])[^\'"]*mso-[^\'"]*\\1/i', '', $html);
+    // 4. Clean up weird bullet characters (·, •, &middot;, &bull;)
+    $html = preg_replace('/(·|•|&middot;|&bull;)\s*/u', '', $html);
+    // 5. If plain text without HTML block tags, format line breaks
+    if (strpos($html, '<p') === false && strpos($html, '<ul') === false && strpos($html, '<div') === false) {
+        $html = nl2br(trim($html));
+    }
+    return trim($html);
+}
+

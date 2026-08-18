@@ -153,6 +153,10 @@ class Job_Circular extends Admin_Controller
                 $data['last_date'] = date('Y-m-d', strtotime($data['last_date']));
             }
 
+            if (!empty($data['description'])) {
+                $data['description'] = clean_job_html($data['description']);
+            }
+
             if (empty($data['status'])) {
                 $data['status'] = 'published';
             }
