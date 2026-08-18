@@ -18,28 +18,21 @@ echo "  🚀 Starting RolandERP / Bizcenter Ubuntu Deployment"
 echo "  Target Domain/IP: $DOMAIN_OR_IP"
 echo "================================================================="
 
-# Clean any broken third-party PPAs first
-sudo rm -f /etc/apt/sources.list.d/ondrej*.list /etc/apt/sources.list.d/ppa_ondrej_php*.list 2>/dev/null || true
+# Aggressively remove any broken ondrej PPA entries from deb822 (.sources) and traditional (.list)
+echo "🧹 Cleaning broken PPA repositories..."
+sudo rm -f /etc/apt/sources.list.d/*ondrej* 2>/dev/null || true
+sudo sed -i '/ondrej/d' /etc/apt/sources.list 2>/dev/null || true
+if [ -d "/etc/apt/sources.list.d" ]; then
+    sudo grep -l "ondrej" /etc/apt/sources.list.d/* 2>/dev/null | xargs -r sudo rm -f || true
+fi
 
 # 1. Update Packages
-echo "📦 Step 1: Updating system packages..."
+echo "📦 Step 1: Updating system package index..."
 sudo apt update -y
 
-# 2. Detect and Install PHP & Extensions
+# 2. Detect and Install PHP & Extensions directly from Ubuntu official repository
 echo "📦 Step 2: Installing Nginx, MySQL Server, and PHP..."
-
-# Try to install PHP directly from Ubuntu official repos first
-if sudo apt install -y nginx mysql-server php php-fpm php-mysql php-curl php-gd php-mbstring php-xml php-zip php-intl php-bcmath php-soap git unzip curl; then
-    echo "✅ Installed PHP directly from official Ubuntu repositories."
-else
-    echo "Attempting PPA fallback with Jammy/Noble compatibility..."
-    sudo apt install -y software-properties-common ca-certificates
-    sudo add-apt-repository -y ppa:ondrej/php || true
-    # Fix codename fallback if on custom/testing release
-    sudo sed -i 's/resolute/noble/g' /etc/apt/sources.list.d/ondrej*.list 2>/dev/null || true
-    sudo apt update -y
-    sudo apt install -y nginx mysql-server php8.3 php8.3-fpm php8.3-mysql php8.3-curl php8.3-gd php8.3-mbstring php8.3-xml php8.3-zip php8.3-intl php8.3-bcmath php8.3-soap git unzip curl
-fi
+sudo apt install -y nginx mysql-server php php-fpm php-mysql php-curl php-gd php-mbstring php-xml php-zip php-intl php-bcmath php-soap git unzip curl
 
 # Detect active PHP-FPM socket
 PHP_SOCK=$(find /var/run/php/ -name "php*-fpm.sock" 2>/dev/null | head -n 1)
