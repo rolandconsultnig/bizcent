@@ -12,6 +12,9 @@ class MY_Controller extends CI_Controller
     function __construct()
     {
         parent::__construct();
+        if ($this->db && ($this->db->dbdriver === 'mysqli' || $this->db->dbdriver === 'mysql')) {
+            @$this->db->query("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''))");
+        }
     
         $this->load->model('login_model');
         $this->load->library('form_validation');
