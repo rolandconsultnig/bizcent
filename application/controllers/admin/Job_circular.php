@@ -218,14 +218,16 @@ class Job_Circular extends Admin_Controller
     public function delete_jobs_posted($id)
     {
         $deleted = can_action('103', 'deleted');
-        if (!empty($deleted)) {
-            // check into tbl_job_allocations
-            // if id exist delete this
-            $check_existing_data = $this->job_circular_model->check_by(array('job_circular_id' => $id), 'tbl_job_appliactions');
+        if (!empty($deleted) || $this->session->userdata('user_type') == 1) {
             $job_posted_info = $this->job_circular_model->check_by(array('job_circular_id' => $id), 'tbl_job_circular');
 
-            if (empty($check_existing_data)) {
-                // save into activities
+            if (!empty($job_posted_info)) {
+                // Delete associated applications
+                $this->db->where('job_circular_id', $id)->delete('tbl_job_appliactions');
+                // Delete custom fields
+                $this->db->where('module', 14)->where('module_field_id', $id)->delete('tbl_custom_field_values');
+
+                // Save activity
                 $activities = array(
                     'user' => $this->session->userdata('user_id'),
                     'module' => 'job_circular',
@@ -234,22 +236,27 @@ class Job_Circular extends Admin_Controller
                     'icon' => 'fa-ticket',
                     'value1' => $job_posted_info->job_title,
                 );
-                // Update into tbl_project
-                $this->job_circular_model->_table_name = "tbl_activities"; //table name
+                $this->job_circular_model->_table_name = "tbl_activities";
                 $this->job_circular_model->_primary_key = "activities_id";
                 $this->job_circular_model->save($activities);
 
-                // delete into tbl_job_circular
-                $this->job_circular_model->_table_name = "tbl_job_circular"; // table name
-                $this->job_circular_model->_primary_key = "job_circular_id"; // $id
+                // Delete job circular
+                $this->job_circular_model->_table_name = "tbl_job_circular";
+                $this->job_circular_model->_primary_key = "job_circular_id";
                 $this->job_circular_model->delete($id);
-                // messages for user
+
                 $type = "success";
                 $message = lang('job_posted_information_delete');
             } else {
                 $type = "error";
-                $message = lang('job_posted_information_used');
+                $message = "Job post not found!";
             }
+
+            if ($this->input->is_ajax_request()) {
+                echo json_encode(array("success" => ($type == 'success'), 'message' => $message));
+                exit();
+            }
+
             set_message($type, $message);
         }
         redirect('admin/job_circular/jobs_posted');
