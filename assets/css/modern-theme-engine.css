@@ -1,0 +1,367 @@
+/* ==========================================================================
+   ROLANDERP / BIZCENTER MODERN THEME ENGINE & UI/UX DESIGN SYSTEM
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap');
+
+:root {
+    /* Base Font */
+    --erp-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --erp-font-heading: 'Outfit', 'Inter', sans-serif;
+    --erp-radius: 12px;
+    --erp-radius-sm: 8px;
+    --erp-radius-lg: 16px;
+
+    /* Accent Defaults: Indigo / Sapphire */
+    --erp-accent: #4f46e5;
+    --erp-accent-hover: #4338ca;
+    --erp-accent-light: rgba(79, 70, 229, 0.12);
+    --erp-accent-glow: rgba(79, 70, 229, 0.35);
+    --erp-accent-gradient: linear-gradient(135deg, #4f46e5, #7c3aed);
+
+    /* Light Mode Tokens (Clean Crisp White Sidebar) */
+    --erp-bg: #f8fafc;
+    --erp-card-bg: #ffffff;
+    --erp-sidebar-bg: #ffffff;
+    --erp-sidebar-text: #475569;
+    --erp-sidebar-text-active: #ffffff;
+    --erp-header-bg: #ffffff;
+    --erp-header-border: #edf2f7;
+    --erp-border: #e2e8f0;
+    --erp-text-main: #0f172a;
+    --erp-text-muted: #64748b;
+    --erp-input-bg: #ffffff;
+    --erp-input-border: #cbd5e1;
+    --erp-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    --erp-shadow-hover: 0 10px 25px -3px rgba(0, 0, 0, 0.08);
+}
+
+/* ==================== 1. MODE VARIATIONS ==================== */
+
+/* Dark Mode (Obsidian) */
+[data-theme="dark"] {
+    --erp-bg: #0b0f19;
+    --erp-card-bg: #111827;
+    --erp-sidebar-bg: #090d16;
+    --erp-sidebar-text: #94a3b8;
+    --erp-sidebar-text-active: #ffffff;
+    --erp-header-bg: #111827;
+    --erp-header-border: #1f2937;
+    --erp-border: #1f2937;
+    --erp-text-main: #f3f4f6;
+    --erp-text-muted: #9ca3af;
+    --erp-input-bg: #1f2937;
+    --erp-input-border: #374151;
+    --erp-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+    --erp-shadow-hover: 0 10px 25px -3px rgba(0, 0, 0, 0.6);
+}
+
+/* Dim Mode (Midnight Navy) */
+[data-theme="dim"] {
+    --erp-bg: #0f172a;
+    --erp-card-bg: #1e293b;
+    --erp-sidebar-bg: #0b1120;
+    --erp-sidebar-text: #94a3b8;
+    --erp-sidebar-text-active: #ffffff;
+    --erp-header-bg: #1e293b;
+    --erp-header-border: #334155;
+    --erp-border: #334155;
+    --erp-text-main: #f8fafc;
+    --erp-text-muted: #94a3b8;
+    --erp-input-bg: #0f172a;
+    --erp-input-border: #475569;
+    --erp-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+    --erp-shadow-hover: 0 10px 25px -3px rgba(0, 0, 0, 0.5);
+}
+
+/* OLED Mode (True Black) */
+[data-theme="oled"] {
+    --erp-bg: #000000;
+    --erp-card-bg: #0a0a0a;
+    --erp-sidebar-bg: #000000;
+    --erp-sidebar-text: #a1a1aa;
+    --erp-sidebar-text-active: #ffffff;
+    --erp-header-bg: #0a0a0a;
+    --erp-header-border: #27272a;
+    --erp-border: #27272a;
+    --erp-text-main: #fafafa;
+    --erp-text-muted: #a1a1aa;
+    --erp-input-bg: #18181b;
+    --erp-input-border: #3f3f46;
+    --erp-shadow: 0 4px 20px -2px rgba(255, 255, 255, 0.03);
+    --erp-shadow-hover: 0 10px 25px -3px rgba(255, 255, 255, 0.06);
+}
+
+/* ==================== 2. ACCENT COLOR PALETTES ==================== */
+
+/* Cyber Emerald / Mint */
+[data-accent="emerald"] {
+    --erp-accent: #10b981;
+    --erp-accent-hover: #059669;
+    --erp-accent-light: rgba(16, 185, 129, 0.12);
+    --erp-accent-glow: rgba(16, 185, 129, 0.35);
+    --erp-accent-gradient: linear-gradient(135deg, #10b981, #0d9488);
+}
+
+/* Royal Purple / Violet */
+[data-accent="violet"] {
+    --erp-accent: #8b5cf6;
+    --erp-accent-hover: #7c3aed;
+    --erp-accent-light: rgba(139, 92, 246, 0.12);
+    --erp-accent-glow: rgba(139, 92, 246, 0.35);
+    --erp-accent-gradient: linear-gradient(135deg, #8b5cf6, #c026d3);
+}
+
+/* Electric Crimson / Coral */
+[data-accent="crimson"] {
+    --erp-accent: #f43f5e;
+    --erp-accent-hover: #e11d48;
+    --erp-accent-light: rgba(244, 63, 94, 0.12);
+    --erp-accent-glow: rgba(244, 63, 94, 0.35);
+    --erp-accent-gradient: linear-gradient(135deg, #f43f5e, #fb7185);
+}
+
+/* Sunset Amber / Gold */
+[data-accent="amber"] {
+    --erp-accent: #f59e0b;
+    --erp-accent-hover: #d97706;
+    --erp-accent-light: rgba(245, 158, 11, 0.12);
+    --erp-accent-glow: rgba(245, 158, 11, 0.35);
+    --erp-accent-gradient: linear-gradient(135deg, #f59e0b, #ea580c);
+}
+
+/* Sky Cyan / Azure */
+[data-accent="cyan"] {
+    --erp-accent: #0284c7;
+    --erp-accent-hover: #0369a1;
+    --erp-accent-light: rgba(2, 132, 199, 0.12);
+    --erp-accent-glow: rgba(2, 132, 199, 0.35);
+    --erp-accent-gradient: linear-gradient(135deg, #0284c7, #06b6d4);
+}
+
+/* ==================== 3. GLOBAL CORE STYLES ==================== */
+
+body {
+    font-family: var(--erp-font-sans) !important;
+    background-color: var(--erp-bg) !important;
+    color: var(--erp-text-main) !important;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+}
+
+h1, h2, h3, h4, h5, h6, .panel-title, .page-header {
+    font-family: var(--erp-font-heading) !important;
+    color: var(--erp-text-main) !important;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+}
+
+/* Panels & Cards */
+.panel, .panel-custom, .panel-default, .card {
+    background-color: var(--erp-card-bg) !important;
+    border: 1px solid var(--erp-border) !important;
+    border-radius: var(--erp-radius) !important;
+    box-shadow: var(--erp-shadow) !important;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.panel:hover {
+    box-shadow: var(--erp-shadow-hover) !important;
+}
+
+.panel-heading {
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--erp-border) !important;
+    color: var(--erp-text-main) !important;
+    padding: 16px 20px !important;
+}
+
+.panel-body {
+    padding: 20px !important;
+    color: var(--erp-text-main) !important;
+}
+
+.panel-footer {
+    background-color: transparent !important;
+    border-top: 1px solid var(--erp-border) !important;
+}
+
+/* Top Navbar */
+.topnavbar {
+    background-color: var(--erp-header-bg) !important;
+    border-bottom: 1px solid var(--erp-header-border) !important;
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.04) !important;
+}
+
+.topnavbar .nav > li > a {
+    color: var(--erp-text-main) !important;
+    transition: color 0.15s;
+}
+
+.topnavbar .nav > li > a:hover {
+    color: var(--erp-accent) !important;
+}
+
+/* Sidebar */
+.aside-wrapper, .sidebar, .aside-inner, .aside {
+    background-color: var(--erp-sidebar-bg) !important;
+    border-right: 1px solid var(--erp-border) !important;
+}
+
+.sidebar .nav > li > a {
+    color: var(--erp-sidebar-text) !important;
+    transition: all 0.15s ease-in-out;
+    font-weight: 500;
+}
+
+.sidebar .nav > li > a:hover {
+    background-color: var(--erp-accent-light) !important;
+    color: var(--erp-accent) !important;
+}
+
+.sidebar .nav > li.active > a,
+.sidebar .nav > li.open > a {
+    background: var(--erp-accent-gradient) !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    box-shadow: 0 4px 15px var(--erp-accent-glow);
+}
+
+.sidebar .nav > li.active > a em,
+.sidebar .nav > li.active > a i,
+.sidebar .nav > li.open > a em,
+.sidebar .nav > li.open > a i {
+    color: #ffffff !important;
+}
+
+.user-block-name {
+    color: var(--erp-text-main) !important;
+    font-weight: 700;
+}
+
+.user-block-role {
+    color: var(--erp-text-muted) !important;
+}
+
+#s-menu {
+    background: var(--erp-bg) !important;
+    border: 1px solid var(--erp-border) !important;
+    color: var(--erp-text-main) !important;
+    border-radius: 9999px;
+}
+
+#s-menu::placeholder {
+    color: var(--erp-text-muted) !important;
+}
+
+.sidebar-subnav {
+    background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+.sidebar-subnav > li > a {
+    color: var(--erp-sidebar-text) !important;
+}
+
+.sidebar-subnav > li > a:hover {
+    color: var(--erp-accent) !important;
+}
+
+/* Buttons */
+.btn-primary, .btn-custom {
+    background: var(--erp-accent) !important;
+    border-color: var(--erp-accent) !important;
+    color: #ffffff !important;
+    border-radius: var(--erp-radius-sm) !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 8px var(--erp-accent-glow);
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover, .btn-custom:hover {
+    background: var(--erp-accent-hover) !important;
+    border-color: var(--erp-accent-hover) !important;
+    transform: translateY(-1px);
+}
+
+/* Form Controls */
+.form-control {
+    background-color: var(--erp-input-bg) !important;
+    border: 1px solid var(--erp-input-border) !important;
+    color: var(--erp-text-main) !important;
+    border-radius: var(--erp-radius-sm) !important;
+    box-shadow: none !important;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-control:focus {
+    border-color: var(--erp-accent) !important;
+    box-shadow: 0 0 0 3px var(--erp-accent-light) !important;
+}
+
+/* Tables */
+.table {
+    color: var(--erp-text-main) !important;
+}
+
+.table > thead > tr > th {
+    background-color: var(--erp-bg) !important;
+    border-bottom: 2px solid var(--erp-border) !important;
+    color: var(--erp-text-muted) !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+.table > tbody > tr > td {
+    border-top: 1px solid var(--erp-border) !important;
+    vertical-align: middle;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: rgba(125, 125, 125, 0.02) !important;
+}
+
+.table-hover > tbody > tr:hover {
+    background-color: var(--erp-accent-light) !important;
+}
+
+/* Text Highlights */
+.text-primary {
+    color: var(--erp-accent) !important;
+}
+
+/* Badges & Pills */
+.label-primary, .badge-primary {
+    background-color: var(--erp-accent) !important;
+    box-shadow: 0 2px 6px var(--erp-accent-glow);
+}
+
+/* Modals */
+.modal-content {
+    background-color: var(--erp-card-bg) !important;
+    border: 1px solid var(--erp-border) !important;
+    border-radius: var(--erp-radius-lg) !important;
+    color: var(--erp-text-main) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.modal-header, .modal-footer {
+    border-color: var(--erp-border) !important;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(150, 150, 150, 0.25);
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--erp-accent);
+}

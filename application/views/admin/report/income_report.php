@@ -38,6 +38,7 @@
                 <p>
                     <?= lang('total_income') ?>: <?php
                     $curency = $this->report_model->check_by(array('code' => config_item('default_currency')), 'tbl_currencies');
+                    $symbol = !empty($curency->symbol) ? $curency->symbol : '$';
                     $mdate = date('Y-m-d');
                     //first day of month
                     $first_day_month = date('Y-m-01');
@@ -50,14 +51,14 @@
                     $this_month = $this->db->where(array('date >=' => $first_day_month, 'date <=' => $mdate))->select_sum('credit')->get('tbl_transactions')->row();
                     $this_week = $this->db->where(array('date >=' => $this_week_start, 'date <=' => $mdate))->select_sum('credit')->get('tbl_transactions')->row();
                     $this_30_days = $this->db->where(array('date >=' => $before_30_days, 'date <=' => $mdate))->select_sum('credit')->get('tbl_transactions')->row();
-                    echo display_money($total_income->credit, $curency->symbol);
+                    echo display_money($total_income->credit ?? 0, $symbol);
                     ?></p>
                 <p><?= lang('total_income_this_month') ?>
-                    : <?= display_money($this_month->credit, $curency->symbol) ?></p>
+                    : <?= display_money($this_month->credit ?? 0, $symbol) ?></p>
                 <p><?= lang('total_income_this_week') ?>
-                    : <?= display_money($this_week->credit, $curency->symbol) ?></p>
+                    : <?= display_money($this_week->credit ?? 0, $symbol) ?></p>
                 <p><?= lang('total_income_last_30') ?>
-                    : <?= display_money($this_30_days->credit, $curency->symbol) ?></p>
+                    : <?= display_money($this_30_days->credit ?? 0, $symbol) ?></p>
             </strong>
 
             <hr>

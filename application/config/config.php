@@ -22,7 +22,14 @@ if (!function_exists('guess_base_url')) {
         $script = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? '/index.php'));
         $dir = rtrim(str_replace(basename($script), '', $script), '/');
         $base_url = $scheme . '://' . $host . $dir . '/';
-        $base_url = preg_replace('#/install/?$#', '/', $base_url);
+        // No preg_* here: config.php loads before CI's error handler state is
+        // consistent, and any warning during that window re-enters get_config()
+        // and re-requires this file (fatal redeclare on builds without the guard).
+        if (substr($base_url, -9) === '/install/') {
+            $base_url = substr($base_url, 0, -8);
+        } elseif (substr($base_url, -8) === '/install') {
+            $base_url = substr($base_url, 0, -7);
+        }
         return $base_url;
     }
 }

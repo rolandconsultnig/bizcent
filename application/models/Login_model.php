@@ -254,7 +254,7 @@ class Login_Model extends MY_Model
     function purge_na($expire_period = 172800)
     {
         $this->db->where('activated', 0);
-        $this->db->where('UNIX_TIMESTAMP(created) <', time() - $expire_period);
+        $this->db->where('created <', date('Y-m-d H:i:s', time() - $expire_period));
         $this->db->delete('tbl_users');
     }
     
@@ -317,7 +317,7 @@ class Login_Model extends MY_Model
         //        $this->db->select('1', FALSE);
         $this->db->where('user_id', $user_id);
         $this->db->where('new_password_key', $new_pass_key);
-        $this->db->where('UNIX_TIMESTAMP(new_password_requested) >', time() - $expire_period);
+        $this->db->where('new_password_requested >', date('Y-m-d H:i:s', time() - $expire_period));
         $query = $this->db->get('tbl_users');
         return $query->num_rows() == 1;
     }
@@ -329,7 +329,7 @@ class Login_Model extends MY_Model
         $this->db->set('new_password_requested', NULL);
         $this->db->where('user_id', $user_id);
         $this->db->where('new_password_key', $new_pass_key);
-        $this->db->where('UNIX_TIMESTAMP(new_password_requested) >=', time() - $expire_period);
+        $this->db->where('new_password_requested >=', date('Y-m-d H:i:s', time() - $expire_period));
         $this->db->update('tbl_users');
         return $this->db->affected_rows() > 0;
     }

@@ -79,7 +79,7 @@ class Invoice extends Admin_Controller
         COALESCE(SUM(tbl_invoices.adjustment), 0) AS all_invoices_adjustment
         FROM tbl_invoices
         LEFT JOIN tbl_items ON tbl_invoices.invoices_id = tbl_items.invoices_id
-        WHERE tbl_invoices.status != 'cancelled' AND tbl_invoices.status != 'draft'  AND tbl_invoices.inv_deleted = 'No' AND  invoice_date = CURDATE()")->row();
+        WHERE tbl_invoices.status != 'cancelled' AND tbl_invoices.status != 'draft'  AND tbl_invoices.inv_deleted = 'No' AND  invoice_date = CURRENT_DATE")->row();
         
         if (!empty($today_invo_res) && $today_invo_res->all_invoices_cost > 0) {
             $today_valid_invo_total = $today_invo_res->all_invoices_cost - $today_invo_res->all_invoices_discount + $today_invo_res->all_invoices_tax + $today_invo_res->all_invoices_adjustment;
@@ -101,7 +101,7 @@ class Invoice extends Admin_Controller
         $payment_today = $this->db->query("SELECT COALESCE(SUM(tbl_payments.amount), 0) as all_paid_amount
         FROM tbl_invoices
         LEFT JOIN tbl_payments ON tbl_invoices.invoices_id = tbl_payments.invoices_id
-        WHERE tbl_invoices.status != 'cancelled' AND tbl_invoices.status != 'draft' AND  payment_date = CURDATE()")->row()->all_paid_amount;
+        WHERE tbl_invoices.status != 'cancelled' AND tbl_invoices.status != 'draft' AND  payment_date = CURRENT_DATE")->row()->all_paid_amount;
         
         
         $due_date_expired_invo_res = $this->db->query("SELECT
@@ -114,7 +114,7 @@ class Invoice extends Admin_Controller
         FROM tbl_invoices
         LEFT JOIN tbl_items ON tbl_invoices.invoices_id = tbl_items.invoices_id
         LEFT JOIN tbl_payments ON tbl_invoices.invoices_id = tbl_payments.invoices_id
-        WHERE tbl_invoices.status != 'cancelled' AND tbl_invoices.status != 'draft' AND due_date < CURDATE() AND status != 'paid'")->row();
+        WHERE tbl_invoices.status != 'cancelled' AND tbl_invoices.status != 'draft' AND due_date < CURRENT_DATE AND status != 'paid'")->row();
         
         if (!empty($due_date_expired_invo_res)) {
             $past_overdue = $due_date_expired_invo_res->all_invoices_cost - $due_date_expired_invo_res->all_invoices_discount
@@ -814,7 +814,7 @@ class Invoice extends Admin_Controller
                 } else if ($filterBy == 'cancelled') {
                     $where = array('status' => 'Cancelled');
                 } else if ($filterBy == 'overdue') {
-                    $where = array('UNIX_TIMESTAMP(due_date) <' => strtotime(date('Y-m-d')), 'status !=' => 'Paid');
+                    $where = array('due_date <' => date('Y-m-d'), 'status !=' => 'Paid');
                 } else if ($filterBy == 'last_month' || $filterBy == 'this_months') {
                     if ($filterBy == 'last_month') {
                         $month = date('Y-m', strtotime('-1 months'));
@@ -1077,7 +1077,7 @@ class Invoice extends Admin_Controller
                     }
                     $where = array('year_paid' => $year, 'month_paid' => $month);
                 } else if ($filterBy == 'today') {
-                    $where = array('UNIX_TIMESTAMP(payment_date)' => strtotime(date('Y-m-d')));
+                    $where = array('DATE(payment_date)' => date('Y-m-d'));
                 } else if (strstr($filterBy, '_')) {
                     $year = str_replace('_', '', $filterBy);
                     $where = array('year_paid' => $year);

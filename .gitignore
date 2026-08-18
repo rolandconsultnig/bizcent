@@ -21,3 +21,8 @@ application/cache/*
 !application/cache/index.php
 !application/cache/index.html
 !application/cache/.gitkeep
+
+# Temporary archives & test dumps
+*.tar.gz
+*.txt
+*.mysql-bak

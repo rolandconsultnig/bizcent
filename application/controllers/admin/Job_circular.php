@@ -134,48 +134,51 @@ class Job_Circular extends Admin_Controller
     {
         $created = can_action('103', 'created');
         $edited = can_action('103', 'edited');
-        if (!empty($created) || !empty($edited) && !empty($id)) {
+        if (!empty($created) || !empty($edited) || $this->session->userdata('user_type') == 1) {
             $data = $this->job_circular_model->array_from_post(array('job_title', 'designations_id', 'employment_type', 'vacancy_no', 'experience', 'age', 'salary_range', 'posted_date', 'description', 'last_date', 'status'));
-            $designation_info = $this->db->where('designations_id', $data['designations_id'])->get('tbl_designations')->row();
-            $permission = $this->input->post('permission', true);
-            // update root category
-            $where = array('designations_id' => $data['designations_id']);
-            // duplicate value check in DB
-            if (!empty($id)) { // if id exist in db update data
-                $job_circular_id = array('job_circular_id !=' => $id);
-            } else { // if id is not exist then set id as null
-                $job_circular_id = null;
+
+            // Format dates properly
+            if (!empty($data['posted_date'])) {
+                $data['posted_date'] = date('Y-m-d', strtotime($data['posted_date']));
+            } else {
+                $data['posted_date'] = date('Y-m-d');
             }
+            if (!empty($data['last_date'])) {
+                $data['last_date'] = date('Y-m-d', strtotime($data['last_date']));
+            }
+
+            if (empty($data['status'])) {
+                $data['status'] = 'published';
+            }
+
+            $designation_name = '';
+            if (!empty($data['designations_id'])) {
+                $designation_info = $this->db->where('designations_id', $data['designations_id'])->get('tbl_designations')->row();
+                if (!empty($designation_info)) {
+                    $designation_name = $designation_info->designations;
+                }
+            }
+
+            $permission = $this->input->post('permission', true);
+            $assigned = 'all';
             if (!empty($permission)) {
                 if ($permission == 'everyone') {
                     $assigned = 'all';
                 } else {
                     $assigned_to = $this->job_circular_model->array_from_post(array('assigned_to'));
                     if (!empty($assigned_to['assigned_to'])) {
+                        $assigned_arr = array();
                         foreach ($assigned_to['assigned_to'] as $assign_user) {
-                            $assigned[$assign_user] = $this->input->post('action_' . $assign_user, true);
+                            $assigned_arr[$assign_user] = $this->input->post('action_' . $assign_user, true);
                         }
+                        $assigned = json_encode($assigned_arr);
                     }
-                }
-                if (!empty($assigned)) {
-                    if ($assigned != 'all') {
-                        $assigned = json_encode($assigned);
-                    }
-                } else {
-                    $assigned = 'all';
-                }
-                $data['permission'] = $assigned;
-            } else {
-                set_message('error', lang('assigned_to') . ' Field is required');
-                if (empty($_SERVER['HTTP_REFERER'])) {
-                    redirect('admin/job_circular/jobs_posted');
-                } else {
-                    redirect($_SERVER['HTTP_REFERER']);
                 }
             }
+            $data['permission'] = $assigned;
 
-            $this->job_circular_model->_table_name = "tbl_job_circular"; // table name
-            $this->job_circular_model->_primary_key = "job_circular_id"; // $id
+            $this->job_circular_model->_table_name = "tbl_job_circular";
+            $this->job_circular_model->_primary_key = "job_circular_id";
             $return_id = $this->job_circular_model->save($data, $id);
 
             if (!empty($id)) {
@@ -195,14 +198,13 @@ class Job_Circular extends Admin_Controller
                 'module_field_id' => $id,
                 'activity' => $activity,
                 'icon' => 'fa-ticket',
-                'value1' => $data['job_title'] . '[' . $designation_info->designations . ']',
+                'value1' => $data['job_title'] . (!empty($designation_name) ? ' [' . $designation_name . ']' : ''),
             );
 
-            // Update into tbl_project
-            $this->job_circular_model->_table_name = "tbl_activities"; //table name
+            $this->job_circular_model->_table_name = "tbl_activities";
             $this->job_circular_model->_primary_key = "activities_id";
             $this->job_circular_model->save($activities);
-            // messages for user
+
             $type = "success";
             $message = $msg;
             set_message($type, $message);

@@ -121,7 +121,7 @@ class Proposals extends Client_Controller
                 $where = array('status !=' => 'draft', 'module' => 'client', 'module_id' => $this->session->userdata('client_id'), 'proposal_month' => $month);
 
             } else if ($filterBy == 'expired') {
-                $where = array('status' => 'pending', 'module' => 'client', 'module_id' => $this->session->userdata('client_id'), 'UNIX_TIMESTAMP(due_date) <' => strtotime(date('Y-m-d')));
+                $where = array('status' => 'pending', 'module' => 'client', 'module_id' => $this->session->userdata('client_id'), 'due_date <' => date('Y-m-d'));
 
             } else if (!empty($filterBy)) {
                 $where = array('module' => 'client', 'module_id' => $this->session->userdata('client_id'), 'status' => $filterBy);

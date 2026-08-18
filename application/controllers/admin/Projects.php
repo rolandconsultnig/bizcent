@@ -105,7 +105,7 @@ class Projects extends Admin_Controller
                 }
             } else {
                 if ($filterBy == 'overdue') {
-                    $where = array('UNIX_TIMESTAMP(end_date) <' => strtotime(date('Y-m-d')), 'project_status !=' => 'completed');
+                    $where = array('end_date <' => date('Y-m-d'), 'project_status !=' => 'completed');
                 } elseif (!empty($filterBy)) {
                     $where = array('tbl_project.project_status' => $filterBy);
                 }

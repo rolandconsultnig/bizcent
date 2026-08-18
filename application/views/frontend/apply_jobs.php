@@ -51,27 +51,19 @@ if (!empty($circular_info->designations_id)) {
             <div class="form-group">
                 <label class="col-sm-3 control-label"><?= lang('cover_later') ?> </label>
                 <div class="col-sm-9">
-                    <textarea name="cover_letter" class="form-control textarea_2" rows="5"></textarea>
+                    <textarea name="cover_letter" class="form-control" rows="4" placeholder="Briefly describe your background, skills, and why you are a great fit for this role..."></textarea>
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-sm-3 control-label"><?= lang('resume') ?> <span class="required"> *</span></label>
+                <label class="col-sm-3 control-label"><?= lang('resume') ?> / Credentials <span class="required"> *</span></label>
                 <div class="col-sm-9">
-                    <div class="fileinput fileinput-new" data-provides="fileinput">
-                                    <span class="btn btn-default btn-file"><span
-                                            class="fileinput-new">Select file</span>
-                                        <span class="fileinput-exists">Change</span>
-                                        <input required type="file" name="resume">
-                                    </span>
-                        <span class="fileinput-filename"></span>
-                        <a href="#" class="close fileinput-exists" data-dismiss="fileinput"
-                           style="float: none;">&times;</a>
-
-                    </div>
+                    <input required type="file" name="resume" class="form-control" accept=".pdf,.doc,.docx,.zip,.rar">
+                    <small class="text-muted"><i class="fa fa-info-circle"></i> Supported formats: PDF, DOC, DOCX, ZIP (Max 10MB)</small>
                 </div>
             </div>
-            <div class="margin pull-right">
-                <button id="btn_emp" type="submit" class="btn btn-primary btn-block"> <?= lang('save') ?></button>
+            <div class="margin pull-right" style="margin-top: 15px;">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?= lang('close') ?></button>
+                <button id="btn_emp" type="submit" class="btn btn-primary"><i class="fa fa-paper-plane"></i> <?= lang('apply_now') ?></button>
             </div>
         </form>
 

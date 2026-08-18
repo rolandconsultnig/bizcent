@@ -140,7 +140,7 @@ class Datatables extends MY_Model
             }
         } else {
             if ($filterBy == 'overdue') {
-                $where = array('UNIX_TIMESTAMP(end_date) <' => strtotime(date('Y-m-d')), 'project_status !=' => 'completed');
+                $where = array('end_date <' => date('Y-m-d'), 'project_status !=' => 'completed');
             } elseif (!empty($filterBy)) {
                 $where = array('project_status' => $filterBy);
             }
@@ -281,7 +281,7 @@ class Datatables extends MY_Model
             } else if ($filterBy == 'cancelled') {
                 $where = array('status' => 'Cancelled');
             } else if ($filterBy == 'overdue') {
-                $where = array('UNIX_TIMESTAMP(due_date) <' => strtotime(date('Y-m-d')), 'status !=' => 'Paid');
+                $where = array('due_date <' => date('Y-m-d'), 'status !=' => 'Paid');
             } else if ($filterBy == 'last_month' || $filterBy == 'this_months') {
                 if ($filterBy == 'last_month') {
                     $month = date('Y-m', strtotime('-1 months'));
@@ -317,7 +317,7 @@ class Datatables extends MY_Model
         } else if ($filterBy == 'cancelled') {
             $where = array('show_client' => 'Yes', 'client_id' => $client_id, 'status' => 'Cancelled');
         } else if ($filterBy == 'overdue') {
-            $where = array('show_client' => 'Yes', 'client_id' => $client_id, 'UNIX_TIMESTAMP(due_date) <' => strtotime(date('Y-m-d')));
+            $where = array('show_client' => 'Yes', 'client_id' => $client_id, 'due_date <' => date('Y-m-d'));
             $status = array('partially_paid', 'Unpaid', 'Cancelled');
             $where_in = array('status', $status);
         } else if ($filterBy == 'last_month' || $filterBy == 'this_months') {
@@ -348,7 +348,7 @@ class Datatables extends MY_Model
             }
             $where = array('client_id' => $client_id, 'status !=' => 'draft', 'estimate_month' => $month);
         } else if ($filterBy == 'expired') {
-            $where = array('client_id' => $client_id, 'status' => 'pending', 'UNIX_TIMESTAMP(due_date) <' => strtotime(date('Y-m-d')));
+            $where = array('client_id' => $client_id, 'status' => 'pending', 'due_date <' => date('Y-m-d'));
         } else if (strstr($filterBy, '_')) {
             $year = str_replace('_', '', $filterBy);
             $where = array('client_id' => $client_id, 'status !=' => 'draft', 'estimate_year' => $year);
@@ -384,7 +384,7 @@ class Datatables extends MY_Model
                 }
                 $where = array('estimate_month' => $month);
             } else if ($filterBy == 'expired') {
-                $where = array('UNIX_TIMESTAMP(due_date) <' => strtotime(date('Y-m-d')));
+                $where = array('due_date <' => date('Y-m-d'));
                 $status = array('draft', 'pending');
                 $where_in = array('status', $status);
             } else if (strstr($filterBy, '_')) {
@@ -423,7 +423,7 @@ class Datatables extends MY_Model
                 }
                 $where = array('credit_note_month' => $month);
             } else if ($filterBy == 'expired') {
-                $where = array('UNIX_TIMESTAMP(due_date) <' => strtotime(date('Y-m-d')));
+                $where = array('due_date <' => date('Y-m-d'));
                 $status = array('draft', 'pending');
                 $where_in = array('status', $status);
             } else if (strstr($filterBy, '_')) {
@@ -463,7 +463,7 @@ class Datatables extends MY_Model
                 $where = array('year_paid' => $year, 'month_paid' => $month);
             } else if ($filterBy == 'today') {
 
-                $where = array('UNIX_TIMESTAMP(payment_date)' => strtotime(date('Y-m-d')));
+                $where = array('DATE(payment_date)' => date('Y-m-d'));
             } else if (strstr($filterBy, '_')) {
                 $year = str_replace('_', '', $filterBy);
                 $where = array('year_paid' => $year);
@@ -496,7 +496,7 @@ class Datatables extends MY_Model
                 }
                 $where = array('proposal_month' => $month);
             } else if ($filterBy == 'expired') {
-                $where = array('UNIX_TIMESTAMP(due_date) <' => strtotime(date('Y-m-d')));
+                $where = array('due_date <' => date('Y-m-d'));
                 $status = array('draft', 'pending');
                 $where_in = array('status', $status);
             } else if (strstr($filterBy, '_')) {
@@ -524,7 +524,7 @@ class Datatables extends MY_Model
             }
             $where = array('status !=' => 'draft', 'module' => 'client', 'module_id' => $this->session->userdata('client_id'), 'proposal_month' => $month);
         } else if ($filterBy == 'expired') {
-            $where = array('status' => 'pending', 'module' => 'client', 'module_id' => $this->session->userdata('client_id'), 'UNIX_TIMESTAMP(due_date) <' => strtotime(date('Y-m-d')));
+            $where = array('status' => 'pending', 'module' => 'client', 'module_id' => $this->session->userdata('client_id'), 'due_date <' => date('Y-m-d'));
         } else if (!empty($filterBy)) {
             $where = array('module' => 'client', 'module_id' => $this->session->userdata('client_id'), 'status' => $filterBy);
         }

@@ -660,4 +660,104 @@ $lang['unread_email'] = 'Only Unread Emails';
 $lang['access_denied'] = 'Access denied';
 $lang['message'] = 'Message';
 
+// HRM Module Labels
+$lang['hrm'] = 'HRM';
+$lang['human_resources'] = 'Human Resources';
+$lang['recruitment'] = 'Recruitment';
+$lang['job_circular'] = 'Job Circular / Recruitment';
+$lang['training'] = 'Training';
+$lang['award'] = 'Awards';
+$lang['awards'] = 'Awards & Recognition';
+$lang['performance'] = 'Performance';
+$lang['promotion'] = 'Promotions';
+$lang['resignation'] = 'Resignations';
+$lang['termination'] = 'Terminations';
+$lang['warning'] = 'Warnings';
+$lang['disciplinary'] = 'Disciplinary & Status';
+$lang['departments'] = 'Departments & Designations';
+$lang['holiday'] = 'Holidays';
+$lang['leave_management'] = 'Leave Management';
+$lang['attendance'] = 'Attendance';
+$lang['payroll'] = 'Payroll & Salary';
 
+// Enterprise Requisitions
+$lang['requisitions'] = 'Requisitions';
+$lang['my_requisitions'] = 'My Requisitions';
+$lang['all_requisitions'] = 'All Requisitions';
+$lang['new_requisition'] = 'New Requisition';
+$lang['requisition_no'] = 'Requisition No';
+$lang['expected_date'] = 'Expected Date';
+$lang['priority'] = 'Priority';
+$lang['purpose'] = 'Purpose / Justification';
+$lang['item_name'] = 'Item Name';
+$lang['unit_price'] = 'Unit Price';
+$lang['total_amount'] = 'Total Amount';
+$lang['approved_by'] = 'Approved By';
+$lang['rejection_reason'] = 'Rejection Reason';
+
+// Enterprise Accounting Suite
+$lang['accounting'] = 'Accounting';
+$lang['chart_of_accounts'] = 'Chart of Accounts';
+$lang['journal_entries'] = 'Journal Entries';
+$lang['general_ledger'] = 'General Ledger';
+$lang['trial_balance'] = 'Trial Balance';
+$lang['balance_sheet'] = 'Balance Sheet';
+$lang['income_statement'] = 'Income Statement (P&L)';
+$lang['account_code'] = 'Account Code';
+$lang['account_type'] = 'Account Type';
+$lang['entry_number'] = 'Entry No';
+$lang['entry_date'] = 'Entry Date';
+$lang['debit'] = 'Debit';
+$lang['credit'] = 'Credit';
+$lang['assets'] = 'Assets';
+$lang['liabilities'] = 'Liabilities';
+$lang['equity'] = 'Equity';
+$lang['revenue'] = 'Revenue';
+$lang['expenses'] = 'Expenses';
+
+// Enterprise Petty Cash
+$lang['petty_cash'] = 'Petty Cash';
+$lang['petty_cash_accounts'] = 'Petty Cash Accounts';
+$lang['petty_cash_vouchers'] = 'Disbursement Vouchers';
+$lang['replenishments'] = 'Replenishments';
+$lang['reconciliation_log'] = 'Cash Reconciliation Log';
+$lang['voucher_no'] = 'Voucher No';
+$lang['custodian'] = 'Custodian';
+$lang['float_limit'] = 'Float Limit';
+$lang['current_balance'] = 'Current Balance';
+$lang['requested_amount'] = 'Requested Amount';
+
+// Enterprise Approvals Hub
+$lang['approvals_hub'] = 'Approvals Hub';
+$lang['pending_approvals'] = 'Pending Approvals';
+$lang['approval_history'] = 'Approval History';
+$lang['approve'] = 'Approve';
+$lang['reject'] = 'Reject';
+
+// Enterprise Virtual Meetings & Teams
+$lang['virtual_meetings'] = 'Virtual Meetings & Teams';
+$lang['meet_now'] = 'Meet Now (Instant)';
+$lang['scheduled_meetings'] = 'Scheduled Meetings';
+$lang['join_meeting'] = 'Join Meeting';
+$lang['meeting_code'] = 'Meeting Code';
+$lang['host'] = 'Host';
+$lang['start_meeting'] = 'Start Meeting';
+$lang['meeting_room'] = 'Virtual Meeting Room';
+
+// In-App Social Network (Ree-Social)
+$lang['social_feed'] = 'Ree-Social';
+$lang['ree_social'] = 'Ree-Social';
+$lang['for_you'] = 'For You';
+$lang['following'] = 'Following';
+$lang['my_posts'] = 'My Posts';
+$lang['post'] = 'Post';
+$lang['what_is_happening'] = 'What is happening in your team today?!';
+$lang['repost'] = 'Repost';
+$lang['like'] = 'Like';
+$lang['reply'] = 'Reply';
+$lang['bookmark'] = 'Bookmark';
+$lang['bookmarks'] = 'Bookmarks';
+$lang['who_to_follow'] = 'Who to follow';
+$lang['trending_topics'] = 'Trending Topics';
+$lang['follow'] = 'Follow';
+$lang['unfollow'] = 'Following';

@@ -59,6 +59,24 @@ $languages = $this->db->where('active', 1)->order_by('name', 'ASC')->get('tbl_la
             <!-- START Right Navbar-->
             <ul class="nav navbar-nav navbar-right">
 
+                <!-- Quick Ree-Social Platform Link -->
+                <li>
+                    <a href="<?= base_url('ree-social') ?>" title="Ree-Social Workplace Network">
+                        <em class="fa fa-hashtag text-info"></em>
+                    </a>
+                </li>
+                <!-- Quick Dark/Light Theme Toggle -->
+                <li>
+                    <a href="javascript:void(0);" onclick="toggleQuickMode();" title="Toggle Light / Dark Mode">
+                        <em class="fa fa-moon-o" id="header_theme_icon"></em>
+                    </a>
+                </li>
+                <!-- Theme Palette Customizer -->
+                <li>
+                    <a href="javascript:void(0);" onclick="toggleThemePanel();" title="Theme Customizer & Colors">
+                        <em class="fa fa-paint-brush"></em>
+                    </a>
+                </li>
                 <!-- Search icon-->
                 <li>
                     <a href="#" data-search-open="">

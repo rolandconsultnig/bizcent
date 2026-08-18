@@ -4,6 +4,14 @@
  * Loaded from index.php before the framework bootstrap.
  */
 
+// Some hardened VPS kernels block the executable-memory allocation PCRE JIT
+// needs, which makes every preg_* call emit a warning. A warning raised while
+// config.php is loading re-enters get_config() and fatals the request, so
+// disable JIT before any pattern functions run. Negligible perf cost.
+if (function_exists('ini_set')) {
+    @ini_set('pcre.jit', '0');
+}
+
 if (function_exists('mysqli_report')) {
     mysqli_report(MYSQLI_REPORT_OFF);
 }

@@ -109,7 +109,7 @@ class Estimates extends Client_Controller
                 }
                 $where = array('client_id' => $client_id, 'status !=' => 'draft', 'estimate_month' => $month);
             } else if ($filterBy == 'expired') {
-                $where = array('client_id' => $client_id, 'status' => 'pending', 'UNIX_TIMESTAMP(due_date) <' => strtotime(date('Y-m-d')));
+                $where = array('client_id' => $client_id, 'status' => 'pending', 'due_date <' => date('Y-m-d'));
             } else if (strstr($filterBy, '_')) {
                 $year = str_replace('_', '', $filterBy);
                 $where = array('client_id' => $client_id, 'status !=' => 'draft', 'estimate_year' => $year);

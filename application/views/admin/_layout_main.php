@@ -156,7 +156,9 @@ if (empty($timezone)) {
             <?= (!empty(config_item('layout-h')) == ' layout-h ' ? '</div>' : '') ?>
             <div class="row">
                 <div class="col-lg-12">
-                    <?php $sqlMode = $this->db->query('SELECT @@sql_mode as mode')->row();
+                    <?php $sqlMode = ($this->db->dbdriver === 'mysqli' || $this->db->dbdriver === 'mysql')
+                        ? $this->db->query('SELECT @@sql_mode as mode')->row()
+                        : null;
                     if ($sqlMode && strpos($sqlMode->mode, 'ONLY_FULL_GROUP_BY') !== FALSE) {
                         echo '<div class="bold text-warning">
             <h4 class="bold">Hi! Your mysql ONLY_FULL_GROUP_BY is enabled.we recommend to disabled it </h4>
@@ -295,6 +297,9 @@ if (!empty($direction) && $direction == 'rtl') {
     <?php $this->load->view('admin/_layout_modal_large'); ?>
     <?php $this->load->view('admin/_layout_modal_extra_lg'); ?>
 <?php } ?>
+
+<!-- Modern Theme & UI/UX Live Customizer -->
+<?php $this->load->view('admin/components/theme_customizer'); ?>
 
 <script>
     document.addEventListener("load", ins_data, false);

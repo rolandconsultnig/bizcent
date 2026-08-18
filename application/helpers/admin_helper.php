@@ -543,17 +543,32 @@ function display_time($value, $no_str = null)
 
 function display_date($value)
 {
-    return strftime(config_item('date_format'), strtotime($value));
+    if (empty($value) || $value == '0000-00-00' || $value == '0000-00-00 00:00:00') {
+        return '-';
+    }
+    $time = is_numeric($value) ? (int)$value : strtotime($value);
+    if (!$time) {
+        return $value;
+    }
+    $format = config_item('date_format') ?: 'd-m-Y';
+    // If format was in strftime % format, convert or fallback
+    $format = str_replace(['%d', '%m', '%Y', '%y', '%B', '%b'], ['d', 'm', 'Y', 'y', 'F', 'M'], $format);
+    return date($format, $time);
 }
 
 function display_datetime($value, $no_str = null)
 {
-    if (!empty($no_str)) {
-        $datetime = $value;
-    } else {
-        $datetime = strtotime($value);
+    if (empty($value) || $value == '0000-00-00' || $value == '0000-00-00 00:00:00') {
+        return '-';
     }
-    return strftime(config_item('date_format'), $datetime) . ' ' . date(config_item('time_format'), $datetime);
+    $time = !empty($no_str) ? (int)$value : (is_numeric($value) ? (int)$value : strtotime($value));
+    if (!$time) {
+        return $value;
+    }
+    $dateFormat = config_item('date_format') ?: 'd-m-Y';
+    $dateFormat = str_replace(['%d', '%m', '%Y', '%y', '%B', '%b'], ['d', 'm', 'Y', 'y', 'F', 'M'], $dateFormat);
+    $timeFormat = config_item('time_format') ?: 'g:i a';
+    return date($dateFormat . ' ' . $timeFormat, $time);
 }
 
 function custom_form_Fields($id, $edit_id = null, $col_sm = null)
@@ -1480,11 +1495,15 @@ function clear_textarea_breaks($text)
 
 function set_mysql_timezone($timezone)
 {
+    $CI = &get_instance();
+    // MySQL-only session setting; the postgre driver has no time_zone parameter.
+    if ($CI->db->dbdriver !== 'mysqli' && $CI->db->dbdriver !== 'mysql') {
+        return true;
+    }
     $offset = timezone_offset_get(new DateTimeZone($timezone), new DateTime());
     $sign = ($offset > 0) ? '+' : '-';
     $offset = gmdate('H:i', abs($offset));
     $zone = $sign . $offset;
-    $CI = &get_instance();
     $CI->db->query("SET time_zone='$zone'");
     return true;
 }

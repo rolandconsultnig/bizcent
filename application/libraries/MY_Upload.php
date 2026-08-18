@@ -165,40 +165,35 @@ class MY_Upload extends CI_Upload
             $cmd = "file --brief --mime " . escapeshellarg($tmp_name) . " 2>&1";
 
             if (function_exists("exec")) {
-                /* This might look confusing, as $mime is being populated with all of the output when set in the second parameter.
-                 * However, we only neeed the last line, which is the actual return value of exec(), and as such - it overwrites
-                 * anything that could already be set for $mime previously. This effectively makes the second parameter a dummy
-                 * value, which is only put to allow us to get the return status code.
-                 */
                 $mime = @exec($cmd, $mime, $return_status);
                 if ($return_status === 0 && is_string($mime) && preg_match($regexp, $mime, $matches)) {
                     $this->file_type = $matches[1];
                     return;
                 }
             }
-        }
 
-        if ((bool)@ini_get("safe_mode") === FALSE && function_exists("shell_exec")) {
-            $mime = @shell_exec($cmd);
-            if (strlen($mime) > 0) {
-                $mime = explode("\n", trim($mime));
-                if (preg_match($regexp, $mime[(count($mime) - 1)], $matches)) {
-                    $this->file_type = $matches[1];
-                    return;
-                }
-            }
-        }
-
-        if (function_exists("popen")) {
-            $proc = @popen($cmd, "r");
-            if (is_resource($proc)) {
-                $mime = @fread($proc, 512);
-                @pclose($proc);
-                if ($mime !== FALSE) {
+            if ((bool)@ini_get("safe_mode") === FALSE && function_exists("shell_exec")) {
+                $mime = @shell_exec($cmd);
+                if (strlen($mime) > 0) {
                     $mime = explode("\n", trim($mime));
                     if (preg_match($regexp, $mime[(count($mime) - 1)], $matches)) {
                         $this->file_type = $matches[1];
                         return;
+                    }
+                }
+            }
+
+            if (function_exists("popen")) {
+                $proc = @popen($cmd, "r");
+                if (is_resource($proc)) {
+                    $mime = @fread($proc, 512);
+                    @pclose($proc);
+                    if ($mime !== FALSE) {
+                        $mime = explode("\n", trim($mime));
+                        if (preg_match($regexp, $mime[(count($mime) - 1)], $matches)) {
+                            $this->file_type = $matches[1];
+                            return;
+                        }
                     }
                 }
             }

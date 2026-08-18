@@ -50,6 +50,7 @@
                         <label class="col-lg-3 control-label"><?= lang('default_priority') ?></label>
                         <div class="col-lg-5">
                             <?php
+                            $options = array();
                             $all_priority = $this->db->get('tbl_priority')->result();
                             foreach ($all_priority as $priority) {
                                 $options[$priority->priority] = $priority->priority;

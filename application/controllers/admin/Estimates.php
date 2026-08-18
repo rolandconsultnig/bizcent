@@ -245,7 +245,7 @@ class Estimates extends Admin_Controller
                     }
                     $where = array('estimate_month' => $month);
                 } else if ($filterBy == 'expired') {
-                    $where = array('UNIX_TIMESTAMP(due_date) <' => strtotime(date('Y-m-d')));
+                    $where = array('due_date <' => date('Y-m-d'));
                     $status = array('draft', 'pending');
                     $where_in = array('status', $status);
                 } else if (strstr($filterBy, '_')) {

@@ -140,9 +140,12 @@
     public function upload_single($field, $path = 'uploads/')
     {
         $config['upload_path'] = (!empty($path) ? $path : 'uploads/');
-        $config['allowed_types'] = config_item('allowed_files');
-        $config['max_size'] = config_item('max_file_size') * 1024;
-        $config['overwrite'] = TRUE;
+        $allowed = config_item('allowed_files');
+        $config['allowed_types'] = !empty($allowed) ? $allowed : 'gif|jpg|png|jpeg|pdf|doc|docx|zip|rar|txt|xlsx|xls';
+        $maxSize = (int)config_item('max_file_size');
+        $config['max_size'] = !empty($maxSize) ? ($maxSize * 1024) : 51200;
+        $config['overwrite'] = FALSE;
+        $config['encrypt_name'] = TRUE;
         $this->load->library('upload', $config);
         $this->upload->initialize($config);
         if (!$this->upload->do_upload($field)) {

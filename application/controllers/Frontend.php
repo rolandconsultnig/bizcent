@@ -65,48 +65,52 @@ class Frontend extends MY_Controller
         $circular_info = $this->db->where('job_circular_id', $id)->get('tbl_job_circular')->row();
 
         $job_circular_email = config_item('job_circular_email');
-        if (!empty($circular_info->designations_id)) {
+        $notifyUser = array();
+        if (!empty($circular_info) && !empty($circular_info->designations_id)) {
             $design_info = $this->db->where('designations_id', $circular_info->designations_id)->get('tbl_designations')->row();
-            $dept_head_id = $this->db->where('departments_id', $design_info->departments_id)->get('tbl_departments')->row();
-            $user_info = $this->job_circular_model->check_by(array('user_id' => $dept_head_id->department_head_id), 'tbl_users');
-            if (!empty($user_info)) {
-                if (!empty($job_circular_email) && $job_circular_email == 1) {
-                    $email_template = email_templates(array('email_group' => 'new_job_application_email'), $dept_head_id->department_head_id, true);
+            if (!empty($design_info) && !empty($design_info->departments_id)) {
+                $dept_head_id = $this->db->where('departments_id', $design_info->departments_id)->get('tbl_departments')->row();
+                if (!empty($dept_head_id) && !empty($dept_head_id->department_head_id)) {
+                    $user_info = $this->job_circular_model->check_by(array('user_id' => $dept_head_id->department_head_id), 'tbl_users');
+                    if (!empty($user_info)) {
+                        if (!empty($job_circular_email) && $job_circular_email == 1) {
+                            $email_template = email_templates(array('email_group' => 'new_job_application_email'), $dept_head_id->department_head_id, true);
+                            if (!empty($email_template) && !empty($email_template->template_body)) {
+                                $message = $email_template->template_body;
+                                $subject = $email_template->subject ?? ('New Job Application: ' . $circular_info->job_title);
+                                $name = str_replace("{NAME}", $data['name'] ?? '', $message);
+                                $job_title = str_replace("{JOB_TITLE}", $circular_info->job_title, $name);
+                                $email = str_replace("{EMAIL}", $data['email'] ?? '', $job_title);
+                                $mobile = str_replace("{MOBILE}", $data['mobile'] ?? '', $email);
+                                $cover_letter = str_replace("{COVER_LETTER}", $data['cover_letter'] ?? '', $mobile);
+                                $Link = str_replace("{LINK}", base_url() . 'admin/job_circular/view_jobs_application/' . $job_appliactions_id, $cover_letter);
+                                $message = str_replace("{SITE_NAME}", config_item('company_name'), $Link);
+                                $mail_data['message'] = $message;
+                                $message = $this->load->view('email_template', $mail_data, TRUE);
 
-                    $message = $email_template->template_body;
-                    $subject = $email_template->subject;
-                    $name = str_replace("{NAME}", $data['name'], $message);
-                    $job_title = str_replace("{JOB_TITLE}", $circular_info->job_title, $name);
-                    $email = str_replace("{EMAIL}", $data['email'], $job_title);
-                    $mobile = str_replace("{MOBILE}", $data['mobile'], $email);
-                    $cover_letter = str_replace("{COVER_LETTER}", $data['cover_letter'], $mobile);
-                    $Link = str_replace("{LINK}", base_url() . 'admin/job_circular/view_jobs_application/' . $job_appliactions_id, $cover_letter);
-                    $message = str_replace("{SITE_NAME}", config_item('company_name'), $Link);
-                    $data['message'] = $message;
-                    $message = $this->load->view('email_template', $data, TRUE);
-
-                    $params['subject'] = $subject;
-                    $params['message'] = $message;
-                    $params['resourceed_file'] = '';
-                    $params['recipient'] = $user_info->email;
-                    $this->job_circular_model->send_email($params);
-                }
-                $notifyUser = array($user_info->user_id);
-            }
-            if (!empty($notifyUser)) {
-                foreach ($notifyUser as $v_user) {
-                    add_notification(array(
-                        'to_user_id' => $v_user,
-                        'description' => 'not_new_job_application',
-                        'icon' => 'globe',
-                        'link' => 'admin/job_circular/view_jobs_application/' . $job_appliactions_id,
-                        'value' => lang('by') . ' ' . $data['name'],
-                    ));
+                                $params['subject'] = $subject;
+                                $params['message'] = $message;
+                                $params['resourceed_file'] = '';
+                                $params['recipient'] = $user_info->email;
+                                $this->job_circular_model->send_email($params);
+                            }
+                        }
+                        $notifyUser = array($user_info->user_id);
+                    }
                 }
             }
-            if (!empty($notifyUser)) {
-                show_notification($notifyUser);
+        }
+        if (!empty($notifyUser)) {
+            foreach ($notifyUser as $v_user) {
+                add_notification(array(
+                    'to_user_id' => $v_user,
+                    'description' => 'not_new_job_application',
+                    'icon' => 'globe',
+                    'link' => 'admin/job_circular/view_jobs_application/' . $job_appliactions_id,
+                    'value' => lang('by') . ' ' . ($data['name'] ?? ''),
+                ));
             }
+            show_notification($notifyUser);
         }
         // messages for user
         $type = "success";

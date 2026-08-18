@@ -193,9 +193,9 @@ class Dashboard extends Admin_Controller
             $this->admin_model->_table_name = "tbl_transactions"; //table name
             $this->admin_model->_order_by = "transactions_id"; // order by
             $total_income = $this->db->query("SELECT  COALESCE(sum(amount), 0) AS amount FROM tbl_transactions where type = 'income'")->row()->amount;
-            $today_income = $this->db->query("SELECT  COALESCE(SUM(amount), 0) AS amount FROM tbl_transactions WHERE type = 'income' AND  date = CURDATE()")->row()->amount;
+            $today_income = $this->db->query("SELECT  COALESCE(SUM(amount), 0) AS amount FROM tbl_transactions WHERE type = 'income' AND  date = CURRENT_DATE")->row()->amount;
             $total_expense = $this->db->query("SELECT  COALESCE(sum(amount), 0) AS amount FROM tbl_transactions where type = 'expense'")->row()->amount;
-            $today_expense = $this->db->query("SELECT  COALESCE(sum(amount), 0) AS amount FROM tbl_transactions where type = 'expense' AND date = CURDATE()")->row()->amount;
+            $today_expense = $this->db->query("SELECT  COALESCE(sum(amount), 0) AS amount FROM tbl_transactions where type = 'expense' AND date = CURRENT_DATE")->row()->amount;
             
             $res = array();
             $res['total_income'] = display_money($total_income, default_currency());

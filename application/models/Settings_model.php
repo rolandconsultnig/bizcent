@@ -45,6 +45,8 @@ class Settings_Model extends MY_Model
 
     function available_translations()
     {
+        $existing = array();
+        $available = array();
         $result = $this->db->get('tbl_languages')->result();
         foreach ($result as $v_result) {
             $existing[] = $v_result->name;
@@ -259,7 +261,8 @@ class Settings_Model extends MY_Model
     {
         if (!$user) {
             $locale_config = $this->db->where('config_key', 'locale')->get('tbl_config')->row();
-            $locale = $this->db->where('locale', $locale_config->value)->get('tbl_locales')->result();
+            $loc_val = !empty($locale_config->value) ? $locale_config->value : 'en-US';
+            $locale = $this->db->where('locale', $loc_val)->get('tbl_locales')->result();
         } else {
             $locale_user = $this->db->where('user_id', $user)->get('tbl_account_details')->result();
 
@@ -270,10 +273,10 @@ class Settings_Model extends MY_Model
             }
             $locale = $this->db->where('locale', $loc)->get('tbl_locales')->result();
         }
-        $loc = $locale[0];
-        $loc_unix = $loc->locale . ".UTF-8";
-        $loc_win = str_replace("_", "-", $loc->locale);
-        setlocale(LC_ALL, $loc_unix, $loc_win, $loc->code);
+        $loc = !empty($locale[0]) ? $locale[0] : (object)['locale' => 'en_US', 'code' => 'en'];
+        $loc_unix = ($loc->locale ?? 'en_US') . ".UTF-8";
+        $loc_win = str_replace("_", "-", ($loc->locale ?? 'en_US'));
+        @setlocale(LC_ALL, $loc_unix, $loc_win, ($loc->code ?? 'en'));
         return $loc;
     }
 

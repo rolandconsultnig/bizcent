@@ -136,7 +136,7 @@ class Invoice extends Client_Controller
             } else if ($filterBy == 'cancelled') {
                 $where = array('show_client' => 'Yes', 'client_id' => $client_id, 'status' => 'Cancelled');
             } else if ($filterBy == 'overdue') {
-                $where = array('show_client' => 'Yes', 'client_id' => $client_id, 'UNIX_TIMESTAMP(due_date) <' => strtotime(date('Y-m-d')));
+                $where = array('show_client' => 'Yes', 'client_id' => $client_id, 'due_date <' => date('Y-m-d'));
                 $status = array('partially_paid', 'Unpaid', 'Cancelled');
                 $where_in = array('status', $status);
             } else if ($filterBy == 'last_month' || $filterBy == 'this_months') {

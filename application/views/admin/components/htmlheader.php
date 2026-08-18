@@ -56,6 +56,8 @@
               href="<?php echo base_url(); ?>assets/css/<?= $sidebar_theme ?>.css">
     <?php }
     ?>
+    <!-- Modern UI/UX Theme Engine & Design System -->
+    <link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/modern-theme-engine.css">
     
     
     <!-- SELECT2-->

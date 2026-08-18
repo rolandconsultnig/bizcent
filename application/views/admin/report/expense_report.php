@@ -36,6 +36,7 @@
             <strong>
                 <p><?= lang('total_expense') ?>: <?php
                     $curency = $this->report_model->check_by(array('code' => config_item('default_currency')), 'tbl_currencies');
+                    $symbol = !empty($curency->symbol) ? $curency->symbol : '$';
                     $mdate = date('Y-m-d');
                     //first day of month
                     $first_day_month = date('Y-m-01');
@@ -48,14 +49,14 @@
                     $this_month = $this->db->where(array('date >=' => $first_day_month, 'date <=' => $mdate))->select_sum('debit')->get('tbl_transactions')->row();
                     $this_week = $this->db->where(array('date >=' => $this_week_start, 'date <=' => $mdate))->select_sum('debit')->get('tbl_transactions')->row();
                     $this_30_days = $this->db->where(array('date >=' => $before_30_days, 'date <=' => $mdate))->select_sum('debit')->get('tbl_transactions')->row();
-                    echo display_money($total_expense->debit, $curency->symbol);
+                    echo display_money($total_expense->debit ?? 0, $symbol);
                     ?></p>
                 <p><?= lang('total_expense_this_month') ?>
-                    : <?= display_money($this_month->debit, $curency->symbol) ?></p>
+                    : <?= display_money($this_month->debit ?? 0, $symbol) ?></p>
                 <p><?= lang('total_expense_this_week') ?>
-                    : <?= display_money($this_week->debit, $curency->symbol) ?></p>
+                    : <?= display_money($this_week->debit ?? 0, $symbol) ?></p>
                 <p><?= lang('total_expense_last_30') ?>
-                    : <?= display_money($this_30_days->debit, $curency->symbol) ?></p>
+                    : <?= display_money($this_30_days->debit ?? 0, $symbol) ?></p>
             </strong>
             <hr>
             
