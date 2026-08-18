@@ -64,7 +64,7 @@
         $prev_method = $this->router->fetch_method();
         $data = apply_filters('before_' . $prev_method, $data);
         // Insert
-        if ($id === NULL) {
+        if (empty($id)) {
             !isset($data[$this->_primary_key]) || $data[$this->_primary_key] = NULL;
             do_action('before_create', $this->_table_name);
             $this->db->set($data);

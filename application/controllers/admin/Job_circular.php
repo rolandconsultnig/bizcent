@@ -135,6 +135,9 @@ class Job_Circular extends Admin_Controller
         if (empty($id)) {
             $id = $this->input->post('job_circular_id', true);
         }
+        if (empty($id)) {
+            $id = NULL;
+        }
         $created = can_action('103', 'created');
         $edited = can_action('103', 'edited');
         if (!empty($created) || !empty($edited) || $this->session->userdata('user_type') == 1) {
