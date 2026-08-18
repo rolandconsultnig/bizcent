@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# ROLANDERP / BIZCENTER - UBUNTU SERVER AUTOMATED DEPLOYMENT SCRIPT
-# Supported OS: Ubuntu 20.04 LTS / 22.04 LTS / 24.04 LTS
+# ROLANDERP / BIZCENTER - ROBUST UBUNTU SERVER DEPLOYMENT SCRIPT
+# Supports: Ubuntu 20.04 (Focal), 22.04 (Jammy), 24.04 (Noble), & Dev Releases
 # ==============================================================================
 
 set -e
@@ -18,19 +18,35 @@ echo "  🚀 Starting RolandERP / Bizcenter Ubuntu Deployment"
 echo "  Target Domain/IP: $DOMAIN_OR_IP"
 echo "================================================================="
 
+# Clean any broken third-party PPAs first
+sudo rm -f /etc/apt/sources.list.d/ondrej*.list /etc/apt/sources.list.d/ppa_ondrej_php*.list 2>/dev/null || true
+
 # 1. Update Packages
 echo "📦 Step 1: Updating system packages..."
-sudo apt update && sudo apt upgrade -y
+sudo apt update -y
 
-# 2. Install Nginx, PHP, MySQL and Required Extensions
-echo "📦 Step 2: Installing Nginx, MySQL, and PHP 8.3 with extensions..."
-sudo apt install -y software-properties-common lsb-release ca-certificates apt-transport-https
-sudo add-apt-repository -y ppa:ondrej/php
-sudo apt update
+# 2. Detect and Install PHP & Extensions
+echo "📦 Step 2: Installing Nginx, MySQL Server, and PHP..."
 
-sudo apt install -y nginx mysql-server \
-  php8.3 php8.3-fpm php8.3-mysql php8.3-curl php8.3-gd php8.3-mbstring \
-  php8.3-xml php8.3-zip php8.3-intl php8.3-bcmath php8.3-soap git unzip curl
+# Try to install PHP directly from Ubuntu official repos first
+if sudo apt install -y nginx mysql-server php php-fpm php-mysql php-curl php-gd php-mbstring php-xml php-zip php-intl php-bcmath php-soap git unzip curl; then
+    echo "✅ Installed PHP directly from official Ubuntu repositories."
+else
+    echo "Attempting PPA fallback with Jammy/Noble compatibility..."
+    sudo apt install -y software-properties-common ca-certificates
+    sudo add-apt-repository -y ppa:ondrej/php || true
+    # Fix codename fallback if on custom/testing release
+    sudo sed -i 's/resolute/noble/g' /etc/apt/sources.list.d/ondrej*.list 2>/dev/null || true
+    sudo apt update -y
+    sudo apt install -y nginx mysql-server php8.3 php8.3-fpm php8.3-mysql php8.3-curl php8.3-gd php8.3-mbstring php8.3-xml php8.3-zip php8.3-intl php8.3-bcmath php8.3-soap git unzip curl
+fi
+
+# Detect active PHP-FPM socket
+PHP_SOCK=$(find /var/run/php/ -name "php*-fpm.sock" 2>/dev/null | head -n 1)
+if [ -z "$PHP_SOCK" ]; then
+    PHP_SOCK="/var/run/php/php-fpm.sock"
+fi
+echo "Using PHP-FPM socket: $PHP_SOCK"
 
 # 3. Configure MySQL Database & User
 echo "🗄️ Step 3: Setting up MySQL database ($DB_NAME)..."
@@ -50,9 +66,9 @@ else
     sudo git clone https://github.com/rolandconsultnig/bizcent.git $APP_DIR
 fi
 
-# 5. Import Database Schema if schema file exists
+# 5. Import Database Schema
 if [ -f "$APP_DIR/install/mysql_full_schema.sql" ]; then
-    echo "📥 Importing database schema..."
+    echo "📥 Importing database schema and seed data..."
     sudo mysql "$DB_NAME" < "$APP_DIR/install/mysql_full_schema.sql" || true
 fi
 
@@ -112,7 +128,7 @@ server {
 
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
+        fastcgi_pass unix:$PHP_SOCK;
         fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
         include fastcgi_params;
         fastcgi_read_timeout 300;
@@ -132,7 +148,7 @@ EOF
 sudo ln -sf /etc/nginx/sites-available/bizcenter /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
-sudo systemctl restart php8.3-fpm
+sudo systemctl restart php*-fpm || true
 sudo systemctl restart nginx
 
 # 9. Setup Background Cron Job
