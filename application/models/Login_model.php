@@ -27,12 +27,18 @@ class Login_Model extends MY_Model
         $this->_order_by = 'user_id';
         
         do_action('before_user_login');
-        $admin = $this->get_by(array(
-            'username' => $this->input->post('user_name'),
-            'activated' => 1,
-            'banned' => 0,
-            'password' => $this->hash($this->input->post('password')),
-        ), TRUE);
+        $username_or_email = trim((string)$this->input->post('user_name', TRUE));
+        $password = $this->hash($this->input->post('password'));
+
+        $this->db->group_start();
+        $this->db->where('username', $username_or_email);
+        $this->db->or_where('email', $username_or_email);
+        $this->db->group_end();
+        $this->db->where('activated', 1);
+        $this->db->where('banned', 0);
+        $this->db->where('password', $password);
+        $admin = $this->db->get('tbl_users')->row();
+
         // get database name
         if (!empty($admin)) {
             $user_info = $this->check_by(array('user_id' => $admin->user_id), 'tbl_account_details');
@@ -51,8 +57,8 @@ class Login_Model extends MY_Model
             $data = array(
                 'user_name' => $admin->username,
                 'email' => $admin->email,
-                'name' => $user_info->fullname,
-                'photo' => $user_info->avatar,
+                'name' => (!empty($user_info->fullname) ? $user_info->fullname : $admin->username),
+                'photo' => (!empty($user_info->avatar) ? $user_info->avatar : ''),
                 'user_id' => $admin->user_id,
                 'last_login' => $admin->last_login,
                 'online_time' => time(),
@@ -112,13 +118,13 @@ class Login_Model extends MY_Model
                         redirect('login');
                     }
                 }
-                $data['warehouse_id'] = $user_info->warehouse_id;
-                $data['designations_id'] = $user_info->designations_id;
+                $data['warehouse_id'] = (!empty($user_info->warehouse_id) ? $user_info->warehouse_id : 0);
+                $data['designations_id'] = (!empty($user_info->designations_id) ? $user_info->designations_id : 0);
                 $data['url'] = (!empty($url) ? $url : 'admin/dashboard');
-            } else if ($user_info->company != '-') {
+            } else if (!empty($user_info->company) && $user_info->company != '-') {
                 if (empty($url)) {
                     $client_menu = $this->common_model->select_client_roll($admin->user_id);
-                    $url = $client_menu[0]->link;
+                    $url = !empty($client_menu[0]->link) ? $client_menu[0]->link : 'client/dashboard';
                 }
                 $data['client_id'] = $user_info->company;
                 $data['url'] = (!empty($url) ? $url : 'client/dashboard');
@@ -126,6 +132,7 @@ class Login_Model extends MY_Model
             $this->session->set_userdata($data);
             return TRUE;
         }
+        return FALSE;
     }
     
     public function set_clocking($id = NULL, $user_id = null, $row = null, $redirect = null)

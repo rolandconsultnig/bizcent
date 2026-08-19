@@ -830,8 +830,8 @@ class User extends Admin_Controller
             } else { // save and update query
                 $login_data['last_ip'] = $this->input->ip_address();
 
-                if (empty($user_id)) {
-                    $password = $this->input->post('password', TRUE);
+                $password = $this->input->post('password', TRUE);
+                if (!empty($password)) {
                     $login_data['password'] = $this->hash($password);
                 }
                 $permission = $this->input->post('permission', true);

@@ -58,7 +58,9 @@ class Admin_Controller extends MY_Controller
                     }
                 }
                 if ($duplicate === false) {
-                    $restricted_link[] = $data1->link;
+                    if (!empty($data1->link) && $data1->link !== '#' && $data1->link !== 'admin/dashboard' && $data1->link !== 'admin') {
+                        $restricted_link[] = $data1->link;
+                    }
                 }
             }
             $exception_uris = $restricted_link;
@@ -83,7 +85,7 @@ class Admin_Controller extends MY_Controller
             for ($i = 1; $i <= $this->uri->total_segments(); $i++) {
                 $uri .= $this->uri->segment($i) . '/';
                 $result = rtrim($uri, '/');
-                if (in_array($result, $exception_uris) == true) {
+                if ($result !== 'admin' && $result !== 'admin/dashboard' && in_array($result, $exception_uris) == true) {
                     redirect('404');
                 }
             }
