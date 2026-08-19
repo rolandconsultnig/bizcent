@@ -607,25 +607,13 @@ class Leave_Management extends Admin_Controller
                                         $this->application_model->send_email($params);
                                     }
                                 }
-                                $notifyUser = array($dept_head->department_head_id);
-                                if (!empty($notifyUser)) {
-                                    foreach ($notifyUser as $v_user) {
-                                        if (!empty($v_user)) {
-                                            if ($v_user != $this->session->userdata('user_id')) {
-                                                add_notification(array(
-                                                    'to_user_id' => $v_user,
-                                                    'description' => 'not_leave_request',
-                                                    'icon' => 'clock-o',
-                                                    'link' => 'admin/leave_management/index/view_details/' . $id,
-                                                    'value' => lang('by') . ' ' . $profile_info->fullname,
-                                                ));
-                                            }
-                                        }
-                                    }
-                                }
-                                if (!empty($notifyUser)) {
-                                    show_notification($notifyUser);
-                                }
+                                notify_authorized_users('leave_management', 'edited', array(
+                                    'description' => 'not_leave_request',
+                                    'icon' => 'clock-o',
+                                    'link' => 'admin/leave_management/index/view_details/' . $id,
+                                    'value' => lang('by') . ' ' . $profile_info->fullname,
+                                    'from_user_id' => $this->session->userdata('user_id')
+                                ), !empty($dept_head->department_head_id) ? $dept_head->department_head_id : null);
                             }
                         }
                     }
@@ -836,6 +824,18 @@ class Leave_Management extends Admin_Controller
                     $status = lang('rejected');
                     $this->send_application_status_by_email($appl_info);
                 }
+
+                if (!empty($appl_info->user_id) && $appl_info->user_id != my_id()) {
+                    add_notification(array(
+                        'to_user_id' => $appl_info->user_id,
+                        'description' => 'not_leave_status_changed',
+                        'icon' => ($appl_info->application_status == '2') ? 'check-circle' : 'times-circle',
+                        'link' => 'admin/leave_management/index/view_details/' . $id,
+                        'value' => $status,
+                        'from_user_id' => my_id()
+                    ));
+                }
+
                 // save into activities
                 $activities = array(
                     'user' => $this->session->userdata('user_id'),

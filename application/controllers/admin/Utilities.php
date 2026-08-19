@@ -145,21 +145,14 @@ class Utilities extends Admin_Controller
                         $this->utilities_model->send_email($params);
                     }
 
-                    $notifyUser = array($dept_head->department_head_id);
-                    if (!empty($notifyUser)) {
-                        foreach ($notifyUser as $v_user) {
-                            add_notification(array(
-                                'to_user_id' => $v_user,
-                                'description' => 'not_overtime_request',
-                                'icon' => 'clock-o',
-                                'link' => 'admin/utilities/view_overtime/' . $overtime_info->overtime_id,
-                                'value' => lang('by') . ' ' . $this->session->userdata('name'),
-                            ));
-                        }
-                    }
-                    if (!empty($notifyUser)) {
-                        show_notification($notifyUser);
-                    }
+                    notify_authorized_users('overtime', 'edited', array(
+                        'to_user_id' => $dept_head->department_head_id,
+                        'description' => 'not_overtime_request',
+                        'icon' => 'clock-o',
+                        'link' => 'admin/utilities/view_overtime/' . $overtime_info->overtime_id,
+                        'value' => lang('by') . ' ' . $this->session->userdata('name'),
+                        'from_user_id' => $this->session->userdata('user_id')
+                    ), !empty($dept_head->department_head_id) ? $dept_head->department_head_id : null);
                 }
             }
             $type = "success";
@@ -197,6 +190,18 @@ class Utilities extends Admin_Controller
         $this->utilities_model->_table_name = "tbl_overtime"; //table name
         $this->utilities_model->_primary_key = "overtime_id";
         $id = $this->utilities_model->save($data, $id);
+
+        if (!empty($overtime_info->user_id) && $overtime_info->user_id != my_id()) {
+            add_notification(array(
+                'to_user_id' => $overtime_info->user_id,
+                'description' => 'not_overtime_status_changed',
+                'icon' => ($status == 'approved') ? 'check-circle' : 'times-circle',
+                'link' => 'admin/utilities/view_overtime/' . $overtime_info->overtime_id,
+                'value' => ucfirst($status),
+                'from_user_id' => my_id()
+            ));
+        }
+
         $type = "success";
         $message = lang('overtime_change_status');
         // save into activities

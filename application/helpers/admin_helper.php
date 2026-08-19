@@ -1578,30 +1578,130 @@ function _mime_content_type($filename)
 function add_notification($values)
 {
     $CI = &get_instance();
+    $data = array();
     foreach ($values as $key => $value) {
         $data[$key] = $value;
     }
     if (!empty($data['from_user_id'])) {
+        $user_id = $data['from_user_id'];
+        $from_user = $CI->db->where('user_id', $user_id)->get('tbl_account_details')->row();
+        $data['name'] = !empty($from_user->fullname) ? $from_user->fullname : '';
+    } else {
         $user_id = $CI->session->userdata('user_id');
-        $data['from_user_id'] = $user_id;
-        $data['name'] = $CI->db->where('user_id', $user_id)->get('tbl_account_details')->row()->fullname;
-    }
-    // Prevent sending notification to non active users.
-    if (isset($data['to_user_id']) && $data['to_user_id'] != 0) {
-        $CI->db->where('user_id', $data['to_user_id']);
-        $user = $CI->db->get('tbl_users')->row();
-        if (!$user) {
-            return false;
+        if (!empty($user_id)) {
+            $data['from_user_id'] = $user_id;
+            $from_user = $CI->db->where('user_id', $user_id)->get('tbl_account_details')->row();
+            $data['name'] = !empty($from_user->fullname) ? $from_user->fullname : '';
         }
-        if ($user) {
-            if ($user->activated == 0) {
-                return false;
-            }
+    }
+    // Prevent sending notification to non active or banned users.
+    if (isset($data['to_user_id']) && $data['to_user_id'] != 0) {
+        $user = $CI->db->where('user_id', $data['to_user_id'])->get('tbl_users')->row();
+        if (!$user || $user->activated == 0 || $user->banned == 1) {
+            return false;
         }
     }
     $data['date'] = date('Y-m-d H:i:s');
     $CI->db->insert('tbl_notifications', $data);
     return true;
+}
+
+/**
+ * Notify all authorized users according to their user level, role, and permission
+ *
+ * @param string|int $menu_id_or_label Menu label (e.g. 'requisitions', 'petty_cash', 'leave_management', 'approvals_hub') or integer menu_id
+ * @param string $action Action permission required ('view', 'created', 'edited', 'deleted')
+ * @param array $notification_data Array containing [description, link, value, icon, from_user_id, etc.]
+ * @param array|int|null $additional_user_ids Optional specific user IDs to include (e.g. assigned users, department heads)
+ * @param array|int|null $exclude_user_ids User IDs to exclude (by default includes from_user_id)
+ * @return int Number of notifications dispatched
+ */
+function notify_authorized_users($menu_id_or_label, $action, $notification_data, $additional_user_ids = null, $exclude_user_ids = null)
+{
+    $CI = &get_instance();
+    $target_users = array();
+
+    // 1. Resolve menu_id
+    $menu_id = 0;
+    if (is_numeric($menu_id_or_label)) {
+        $menu_id = (int)$menu_id_or_label;
+    } else {
+        $menu_row = $CI->db->where('label', $menu_id_or_label)->get('tbl_menu')->row();
+        if ($menu_row) {
+            $menu_id = (int)$menu_row->menu_id;
+        }
+    }
+
+    // 2. Add all Active Admins (User level 1 - system administrators always receive alerts)
+    $admins = $CI->db->where(array('role_id' => 1, 'activated' => 1, 'banned' => 0))->get('tbl_users')->result();
+    if (!empty($admins)) {
+        foreach ($admins as $adm) {
+            $target_users[(int)$adm->user_id] = true;
+        }
+    }
+
+    // 3. Add Staff users with appropriate role permissions
+    if ($menu_id > 0) {
+        $CI->db->select('tbl_users.user_id');
+        $CI->db->from('tbl_user_role');
+        $CI->db->join('tbl_account_details', 'tbl_account_details.designations_id = tbl_user_role.designations_id', 'inner');
+        $CI->db->join('tbl_users', 'tbl_users.user_id = tbl_account_details.user_id', 'inner');
+        $CI->db->where('tbl_user_role.menu_id', $menu_id);
+        if (!empty($action) && in_array($action, array('view', 'created', 'edited', 'deleted'))) {
+            $CI->db->where('tbl_user_role.' . $action, 1);
+        }
+        $CI->db->where('tbl_users.activated', 1);
+        $CI->db->where('tbl_users.banned', 0);
+        $permitted_staff = $CI->db->get()->result();
+
+        if (!empty($permitted_staff)) {
+            foreach ($permitted_staff as $staff_row) {
+                $target_users[(int)$staff_row->user_id] = true;
+            }
+        }
+    }
+
+    // 4. Add any explicitly specified additional users (e.g. department head or assigned reviewer)
+    if (!empty($additional_user_ids)) {
+        if (!is_array($additional_user_ids)) {
+            $additional_user_ids = array($additional_user_ids);
+        }
+        foreach ($additional_user_ids as $uid) {
+            if (!empty($uid)) {
+                $check = $CI->db->where(array('user_id' => (int)$uid, 'activated' => 1, 'banned' => 0))->get('tbl_users')->row();
+                if ($check) {
+                    $target_users[(int)$uid] = true;
+                }
+            }
+        }
+    }
+
+    // 5. Exclude sender and explicit exclusions
+    $from_user_id = isset($notification_data['from_user_id']) ? (int)$notification_data['from_user_id'] : (int)$CI->session->userdata('user_id');
+    if ($from_user_id > 0) {
+        unset($target_users[$from_user_id]);
+    }
+    if (!empty($exclude_user_ids)) {
+        if (!is_array($exclude_user_ids)) {
+            $exclude_user_ids = array($exclude_user_ids);
+        }
+        foreach ($exclude_user_ids as $xid) {
+            unset($target_users[(int)$xid]);
+        }
+    }
+
+    // 6. Dispatch notifications to all authorized recipients
+    $dispatched = 0;
+    foreach (array_keys($target_users) as $recipient_id) {
+        $payload = $notification_data;
+        $payload['to_user_id'] = $recipient_id;
+        $payload['from_user_id'] = $from_user_id;
+        if (add_notification($payload)) {
+            $dispatched++;
+        }
+    }
+
+    return $dispatched;
 }
 
 function profile($id = null)

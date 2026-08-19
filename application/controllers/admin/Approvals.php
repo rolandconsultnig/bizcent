@@ -62,11 +62,24 @@ class Approvals extends Admin_Controller
         $status = ($action == 'approve') ? 'approved' : 'rejected';
 
         if ($type == 'requisition') {
+            $req = $this->db->where('requisition_id', $id)->get('tbl_requisitions')->row();
             $this->db->where('requisition_id', $id)->update('tbl_requisitions', [
                 'status' => $status,
                 'approved_by' => $user_id,
                 'approved_date' => date('Y-m-d H:i:s')
             ]);
+
+            if ($req && !empty($req->user_id) && $req->user_id != $user_id) {
+                add_notification([
+                    'to_user_id' => $req->user_id,
+                    'from_user_id' => $user_id,
+                    'description' => 'not_requisition_status_updated',
+                    'value' => $req->requisition_no . ' (' . ucfirst($status) . ')',
+                    'link' => 'admin/requisition/my_requisitions',
+                    'icon' => ($status == 'approved') ? 'fa fa-check-circle' : 'fa fa-times-circle'
+                ]);
+            }
+
             set_message('success', 'Requisition ' . ucfirst($status));
         } elseif ($type == 'replenishment') {
             $rep = $this->db->where('replenishment_id', $id)->get('tbl_petty_cash_replenishments')->row();
@@ -83,6 +96,17 @@ class Approvals extends Admin_Controller
                             'current_balance' => $acc->current_balance + $rep->requested_amount
                         ]);
                     }
+                }
+
+                if (!empty($rep->requested_by) && $rep->requested_by != $user_id) {
+                    add_notification([
+                        'to_user_id' => $rep->requested_by,
+                        'from_user_id' => $user_id,
+                        'description' => 'not_petty_cash_status_updated',
+                        'value' => $rep->ref_no . ' (' . ucfirst($status) . ')',
+                        'link' => 'admin/petty_cash/replenishments',
+                        'icon' => ($status == 'approved') ? 'fa fa-check-circle' : 'fa fa-times-circle'
+                    ]);
                 }
             }
             set_message('success', 'Replenishment ' . ucfirst($status));

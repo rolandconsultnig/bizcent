@@ -120,7 +120,7 @@
             new_notification = "<?php lang('new_notification'); ?>",
             credit_amount_bigger_then_remaining_credit = "<?= lang('credit_amount_bigger_then_remaining_credit'); ?>",
             credit_amount_bigger_then_invoice_due = "<?= lang('credit_amount_bigger_then_due_amount'); ?>",
-            auto_check_for_new_notifications = <?php echo (int) config_item('auto_check_for_new_notifications'); ?>,
+            auto_check_for_new_notifications = <?php $chk = config_item('auto_check_for_new_notifications'); echo (!empty($chk) && (int)$chk > 0) ? (int)$chk : 15; ?>,
             file_upload_instruction = "<?php echo lang('file_upload_instruction_js'); ?>",
             filename_too_long = "<?php echo lang('filename_too_long'); ?>";
         desktop_notifications = "<?php echo (int) config_item('desktop_notifications'); ?>";

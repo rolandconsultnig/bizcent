@@ -761,3 +761,14 @@ $lang['who_to_follow'] = 'Who to follow';
 $lang['trending_topics'] = 'Trending Topics';
 $lang['follow'] = 'Follow';
 $lang['unfollow'] = 'Following';
+
+// Notifications for Pending Items & Approvals
+$lang['not_new_requisition_submitted'] = 'New requisition submitted - %s';
+$lang['not_requisition_status_updated'] = 'Requisition %s status has been %s';
+$lang['not_new_petty_cash_voucher'] = 'New petty cash voucher submitted - %s';
+$lang['not_new_petty_cash_replenishment'] = 'New petty cash replenishment request - %s';
+$lang['not_petty_cash_status_updated'] = 'Petty cash request %s has been %s';
+$lang['not_meeting_scheduled'] = 'New virtual meeting scheduled: %s';
+$lang['not_pending_approval_alert'] = 'Pending approval requires your attention: %s';
+$lang['not_leave_status_changed'] = 'Your leave application status has been %s';
+$lang['not_overtime_status_changed'] = 'Your overtime request status has been %s';

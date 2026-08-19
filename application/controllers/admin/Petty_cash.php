@@ -99,6 +99,16 @@ class Petty_cash extends Admin_Controller
             $data['voucher_no'] = 'PCV-' . date('Ymd') . '-' . rand(100, 999);
             $data['created_at'] = date('Y-m-d H:i:s');
             $this->db->insert('tbl_petty_cash_vouchers', $data);
+
+            // Notify authorized finance staff / admins
+            notify_authorized_users('petty_cash', 'view', [
+                'description' => 'not_new_petty_cash_voucher',
+                'link' => 'admin/petty_cash/vouchers',
+                'value' => $data['voucher_no'] . ' (' . $data['payee'] . ' - ' . display_money($amount) . ')',
+                'icon' => 'fa fa-money',
+                'from_user_id' => $user_id
+            ]);
+
             set_message('success', 'Petty Cash Voucher recorded.');
         }
         redirect('admin/petty_cash/vouchers');
@@ -135,6 +145,16 @@ class Petty_cash extends Admin_Controller
         ];
 
         $this->db->insert('tbl_petty_cash_replenishments', $data);
+
+        // Alert approvers / finance managers / admins
+        notify_authorized_users('petty_cash', 'edited', [
+            'description' => 'not_new_petty_cash_replenishment',
+            'link' => 'admin/approvals/pending',
+            'value' => $data['ref_no'] . ' (' . display_money($data['requested_amount']) . ')',
+            'icon' => 'fa fa-money',
+            'from_user_id' => $user_id
+        ]);
+
         set_message('success', 'Replenishment request submitted for approval.');
         redirect('admin/petty_cash/replenishments');
     }
@@ -158,6 +178,19 @@ class Petty_cash extends Admin_Controller
                     $this->db->where('petty_account_id', $acc->petty_account_id)->update('tbl_petty_cash_accounts', ['current_balance' => $new_bal]);
                 }
             }
+
+            // Notify requester
+            if (!empty($rep->requested_by) && $rep->requested_by != $user_id) {
+                add_notification([
+                    'to_user_id' => $rep->requested_by,
+                    'from_user_id' => $user_id,
+                    'description' => 'not_petty_cash_status_updated',
+                    'value' => $rep->ref_no . ' (' . ucfirst($status) . ')',
+                    'link' => 'admin/petty_cash/replenishments',
+                    'icon' => ($status == 'approved') ? 'fa fa-check-circle' : 'fa fa-times-circle'
+                ]);
+            }
+
             set_message('success', 'Replenishment request ' . ucfirst($status));
         }
         redirect('admin/petty_cash/replenishments');

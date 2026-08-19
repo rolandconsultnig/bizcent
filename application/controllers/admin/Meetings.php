@@ -76,6 +76,16 @@ class Meetings extends Admin_Controller
         ];
 
         $this->db->insert('tbl_meetings', $data);
+
+        $attendees = $this->input->post('attendees', true);
+        notify_authorized_users('meetings', 'view', [
+            'description' => 'not_meeting_scheduled',
+            'link' => 'admin/meetings/room/' . $code,
+            'value' => $data['title'] . ' (' . date('M j, g:i A', strtotime($start_datetime)) . ')',
+            'icon' => 'fa fa-video-camera',
+            'from_user_id' => $user_id
+        ], $attendees);
+
         set_message('success', 'Virtual meeting scheduled successfully.');
         redirect('admin/meetings/scheduled');
     }

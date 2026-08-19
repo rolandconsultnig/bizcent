@@ -115,6 +115,25 @@ class Requisition extends Admin_Controller
             $data['created_at'] = date('Y-m-d H:i:s');
             $this->db->insert('tbl_requisitions', $data);
             $req_id = $this->db->insert_id();
+
+            // Get department head if available
+            $dept_head_id = null;
+            if (!empty($data['departments_id'])) {
+                $dept = $this->db->where('departments_id', $data['departments_id'])->get('tbl_departments')->row();
+                if ($dept && !empty($dept->department_head_id)) {
+                    $dept_head_id = $dept->department_head_id;
+                }
+            }
+
+            // Alert authorized reviewers by User Level and Permission
+            notify_authorized_users('requisitions', 'view', [
+                'description' => 'not_new_requisition_submitted',
+                'link' => 'admin/requisition/all_requisitions',
+                'value' => $data['requisition_no'] . ' (' . $data['title'] . ')',
+                'icon' => 'fa fa-shopping-cart',
+                'from_user_id' => $user_id
+            ], $dept_head_id);
+
             set_message('success', 'Requisition submitted successfully.');
         }
 
@@ -144,6 +163,8 @@ class Requisition extends Admin_Controller
         $user_id = $this->session->userdata('user_id');
         $rejection_reason = $this->input->post('rejection_reason', true);
         
+        $req_info = $this->db->where('requisition_id', $id)->get('tbl_requisitions')->row();
+
         $update = [
             'status' => $status,
             'approved_by' => $user_id,
@@ -154,6 +175,19 @@ class Requisition extends Admin_Controller
         }
 
         $this->db->where('requisition_id', $id)->update('tbl_requisitions', $update);
+
+        // Notify the requester about the status change
+        if ($req_info && !empty($req_info->user_id) && $req_info->user_id != $user_id) {
+            add_notification([
+                'to_user_id' => $req_info->user_id,
+                'from_user_id' => $user_id,
+                'description' => 'not_requisition_status_updated',
+                'value' => $req_info->requisition_no . ' (' . ucfirst($status) . ')',
+                'link' => 'admin/requisition/my_requisitions',
+                'icon' => ($status == 'approved') ? 'fa fa-check-circle' : 'fa fa-times-circle'
+            ]);
+        }
+
         set_message('success', 'Requisition status updated to ' . ucfirst($status));
         
         if (!empty($_SERVER['HTTP_REFERER'])) {
