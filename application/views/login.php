@@ -3,7 +3,11 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title><?php echo $title; ?></title>
     <?php if (config_item('favicon') != '') : ?>
         <link rel="icon" href="<?php echo base_url() . config_item('favicon'); ?>" type="image/png">
@@ -136,13 +140,18 @@ if (!empty($login_background[0]) && $login_background[0] == 'image') {
     }
 } ?>
 <style>
-    body {
-        background-color: #ffffff;
+    html, body {
+        background-color: #f8fafc;
+        min-height: 100%;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     .left-login {
         height: auto;
-        min-height: 100%;
+        min-height: 100vh;
         background: #fff;
         -webkit-box-shadow: 2px 0px 7px 1px rgba(0, 0, 0, 0.08);
         -moz-box-shadow: 2px 0px 7px 1px rgba(0, 0, 0, 0.08);
@@ -153,29 +162,88 @@ if (!empty($login_background[0]) && $login_background[0] == 'image') {
         -webkit-box-shadow: 0px 0px 28px -9px rgba(0, 0, 0, 0.74);
         -moz-box-shadow: 0px 0px 28px -9px rgba(0, 0, 0, 0.74);
         box-shadow: 0px 0px 28px -9px rgba(0, 0, 0, 0.74);
+        border-radius: 12px;
     }
 
     .apply_jobs {
         position: absolute;
-        z-index: 1;
-        right: 0;
-        top: 0
+        z-index: 10;
+        right: 15px;
+        top: 15px;
+        border-radius: 8px;
     }
 
     .login-center {
         background: #fff;
-        width: 400px;
+        width: 100%;
+        max-width: 440px;
+        margin: 40px auto;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        padding: 30px 25px;
+    }
+
+    .block-center {
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .wd-xl {
+        width: 100%;
+        max-width: 380px;
         margin: 0 auto;
     }
 
-    @media only screen and (max-width: 380px) {
+    /* Mobile form input touch improvements */
+    .form-control {
+        font-size: 16px !important; /* Prevents iOS Safari auto-zoom */
+        height: 46px;
+        border-radius: 10px;
+    }
+
+    .btn {
+        min-height: 44px;
+        border-radius: 10px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    /* Mobile Screen Adjustments */
+    @media only screen and (max-width: 768px) {
         .login-center {
-            width: 320px;
-            padding: 10px;
+            max-width: 92%;
+            margin: 20px auto;
+            padding: 24px 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
         }
 
-        .wd-xl {
-            width: 260px;
+        .left-login {
+            width: 100% !important;
+            padding: 20px 15px !important;
+            float: none !important;
+        }
+
+        .apply_jobs {
+            position: static;
+            display: block;
+            width: 92%;
+            margin: 10px auto 20px;
+            text-align: center;
+        }
+
+        .wrapper {
+            margin: 0 auto !important;
+        }
+
+        /* Stack sign-in and attendance buttons nicely on mobile */
+        form button[type="submit"] {
+            width: 100% !important;
+            margin-bottom: 10px !important;
+            float: none !important;
         }
     }
 </style>

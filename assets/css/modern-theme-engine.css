@@ -365,3 +365,194 @@ h1, h2, h3, h4, h5, h6, .panel-title, .page-header {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--erp-accent);
 }
+
+/* ==========================================================================
+   MOBILE & TABLET RESPONSIVE UX ENGINE (IOS / ANDROID / TOUCH)
+   ========================================================================== */
+
+/* 1. Global Touch & Viewport Optimization */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    padding-top: env(safe-area-inset-top, 0);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding-left: env(safe-area-inset-left, 0);
+    padding-right: env(safe-area-inset-right, 0);
+}
+
+/* Touch-friendly inputs & buttons */
+input, select, textarea, button {
+    touch-action: manipulation;
+}
+
+.form-control {
+    font-size: 15px !important; /* Prevents auto-zoom on iOS */
+    min-height: 42px;
+}
+
+.btn {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 2. Responsive Tables with Momentum Scrolling */
+.table-responsive {
+    border: 1px solid var(--erp-border) !important;
+    border-radius: var(--erp-radius) !important;
+    -webkit-overflow-scrolling: touch !important;
+    margin-bottom: 20px;
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* 3. Mobile Header & Topbar Optimization (<= 768px) */
+@media (max-width: 768px) {
+    .topnavbar {
+        height: auto;
+        min-height: 55px;
+    }
+
+    .topnavbar .navbar-header {
+        float: left;
+        width: auto !important;
+        text-align: left;
+    }
+
+    .topnavbar .nav-wrapper {
+        padding: 0 5px;
+    }
+
+    .topnavbar .navbar-nav {
+        margin: 0;
+        float: right;
+    }
+
+    .topnavbar .navbar-nav > li {
+        float: left;
+    }
+
+    .topnavbar .navbar-nav > li > a {
+        padding: 15px 10px !important;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Top Breadcrumb & Clock-in Bar */
+    .content-wrapper > .content-heading {
+        padding: 15px 12px !important;
+        font-size: 18px !important;
+    }
+
+    .content-wrapper > .content-heading .pull-right {
+        float: none !important;
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+    }
+
+    /* Mobile Dashboard Cards & Grid Stacking */
+    .row {
+        margin-left: -8px;
+        margin-right: -8px;
+    }
+
+    .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12,
+    .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6,
+    .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4,
+    .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3 {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .panel, .card {
+        margin-bottom: 15px;
+    }
+
+    .panel-body, .card-body {
+        padding: 14px !important;
+    }
+
+    /* Action Modals on Mobile */
+    .modal-dialog {
+        margin: 15px auto !important;
+        width: 94% !important;
+        max-width: 94% !important;
+    }
+
+    .modal-content {
+        border-radius: var(--erp-radius) !important;
+    }
+
+    /* Notifications Dropdown on Mobile */
+    .notifications-list {
+        width: 300px !important;
+        max-width: 90vw !important;
+        right: -60px !important;
+        left: auto !important;
+    }
+
+    /* DataTables Controls on Mobile */
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter {
+        float: none !important;
+        text-align: left !important;
+        margin-bottom: 10px;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-top: 5px;
+    }
+
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+        float: none !important;
+        text-align: center !important;
+        margin-top: 10px;
+    }
+
+    /* Form Actions & Button Groups */
+    .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .btn-group > .btn {
+        flex: 1 1 auto;
+    }
+}
+
+/* 4. Small Mobile Phones (<= 480px) */
+@media (max-width: 480px) {
+    .content-wrapper {
+        padding: 10px 8px !important;
+    }
+
+    .panel-title {
+        font-size: 15px !important;
+    }
+
+    .btn {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+    .table > thead > tr > th,
+    .table > tbody > tr > td {
+        padding: 10px 8px !important;
+        font-size: 13px;
+    }
+}
