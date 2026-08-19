@@ -1068,8 +1068,36 @@ CREATE TABLE `tbl_leave_category` (
 DROP TABLE IF EXISTS `tbl_locales`;
 CREATE TABLE `tbl_locales` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(20) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `locale` varchar(50) NOT NULL,
+  `language` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `tbl_locales` (`id`, `code`, `name`, `locale`, `language`) VALUES
+(1, 'en', 'English (West Africa / Nigeria)', 'en_NG', 'english'),
+(2, 'en', 'English (West Africa / Ghana)', 'en_GH', 'english'),
+(3, 'en', 'English (United States)', 'en_US', 'english'),
+(4, 'en', 'English (United Kingdom)', 'en_GB', 'english'),
+(5, 'en', 'English (Canada)', 'en_CA', 'english'),
+(6, 'en', 'English (Australia)', 'en_AU', 'english'),
+(7, 'en', 'English (South Africa)', 'en_ZA', 'english'),
+(8, 'en', 'English (Kenya)', 'en_KE', 'english'),
+(9, 'fr', 'French (West Africa / Senegal)', 'fr_SN', 'french'),
+(10, 'fr', 'French (West Africa / Ivory Coast)', 'fr_CI', 'french'),
+(11, 'fr', 'French (France)', 'fr_FR', 'french'),
+(12, 'ha', 'Hausa (Nigeria / West Africa)', 'ha_NG', 'hausa'),
+(13, 'yo', 'Yoruba (Nigeria / West Africa)', 'yo_NG', 'yoruba'),
+(14, 'ig', 'Igbo (Nigeria / West Africa)', 'ig_NG', 'igbo'),
+(15, 'ar', 'Arabic', 'ar_SA', 'arabic'),
+(16, 'de', 'German (Germany)', 'de_DE', 'german'),
+(17, 'es', 'Spanish (Spain)', 'es_ES', 'spanish'),
+(18, 'pt', 'Portuguese (Brazil)', 'pt_BR', 'portuguese'),
+(19, 'zh', 'Chinese (Simplified)', 'zh_CN', 'chinese'),
+(20, 'ja', 'Japanese', 'ja_JP', 'japanese'),
+(21, 'hi', 'Hindi (India)', 'hi_IN', 'hindi'),
+(22, 'sw', 'Swahili (East Africa)', 'sw_KE', 'swahili');
 
 DROP TABLE IF EXISTS `tbl_manufacturer`;
 CREATE TABLE `tbl_manufacturer` (
