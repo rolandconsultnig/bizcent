@@ -2,27 +2,93 @@
 
     var base_url = '<?= base_url()?>';
     var userid = '<?= $this->session->userdata('user_id')?>';
-    $(document).ready(function () {
-        initScrollbar("#chat_list", {setHeight: 600});
-        if (window.matchMedia("(max-width: 767px)").matches) {
-            initScrollbar("#chat_list", {setHeight: 300});
+    var interval_time = typeof interval_time !== 'undefined' ? interval_time : 8000;
+    var open_chats = typeof open_chats !== 'undefined' ? open_chats : [];
+
+    function make_chats_draggable() {
+        if (typeof $.fn.draggable === 'function') {
+            // Make floating chat launcher movable
+            if ($('#open_chat_list').length && !$('#open_chat_list').data('ui-draggable')) {
+                $('#open_chat_list').draggable({
+                    containment: 'window',
+                    scroll: false,
+                    cursor: 'move'
+                });
+            }
+
+            // Make chat user list panel movable
+            if ($('#chat_list').length && !$('#chat_list').data('ui-draggable')) {
+                $('#chat_list').draggable({
+                    handle: '.panel-heading',
+                    containment: 'window',
+                    scroll: false,
+                    cursor: 'move',
+                    start: function () {
+                        $(this).css('z-index', 9999999999);
+                    }
+                });
+            }
+
+            // Make all active chat windows movable
+            $('#chat_box .panel').each(function () {
+                if (!$(this).data('ui-draggable')) {
+                    $(this).draggable({
+                        handle: '.panel-heading',
+                        containment: 'window',
+                        scroll: false,
+                        cursor: 'move',
+                        start: function () {
+                            $(this).css('z-index', 9999999999);
+                        }
+                    });
+                }
+            });
         }
-        // my
-        $('#open_chat_list').on("click", function(){
+    }
+
+    $(document).ready(function () {
+        if (typeof initScrollbar === 'function') {
+            initScrollbar("#chat_list", {setHeight: 600});
+            if (window.matchMedia("(max-width: 767px)").matches) {
+                initScrollbar("#chat_list", {setHeight: 300});
+            }
+        }
+
+        make_chats_draggable();
+
+        // Open chat list
+        $(document).on("click", "#open_chat_list", function () {
             $('#chat_box').css("margin-right", "256px");
             if (window.matchMedia("(max-width: 767px)").matches) {
                 $('#chat_box').css("margin-right", "200px");
                 $('#chat_list').css("height", "300px");
             }
-            $('#chat_list').fadeIn(5);
+            $('#chat_list').fadeIn(150);
             $('#open_chat_list').hide();
+            make_chats_draggable();
         });
-        // my
-        $('#close_chat_list').on("click", function(){
+
+        // Close chat list
+        $(document).on("click", "#close_chat_list", function () {
             $('#open_chat_list').show();
             $('#chat_box').css("margin-right", "70px");
-            $('#chat_list').fadeOut(5);
+            $('#chat_list').fadeOut(150);
         });
+
+        // Live Contact Search Filter
+        $(document).on("keyup input", "#chat_user_search_input", function () {
+            var q = $(this).val().toLowerCase().trim();
+            $('#chat_users_container .chat-user-item').each(function () {
+                var name = $(this).find('.chat-user-name').text().toLowerCase();
+                var role = $(this).find('.chat-user-role').text().toLowerCase();
+                if (name.indexOf(q) !== -1 || role.indexOf(q) !== -1) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+
         $('#chat_multi_user_button').on("click", function(){
             $.ajax({
                 url: base_url + "chat/load_multi_chat",
@@ -32,15 +98,12 @@
                 }
             });
         });
-        // my custom
-        $('.start_chat').on("click", function(){
-            // var panel = $('#chat_box').children('div').length;
-            // if(panel > 2){
-            //   // var child=".panel:nth-child("
-            //    $('#chat_box').children('.panel:nth-child('+parseInt(panel-1)+')').addClass('hide');
-            //    // $('#chat_box').children('.panel:last-child').addClass('new_panel');
-            // }
-            var user_id = $(this).data().user_id;
+
+        // Start chat with user (event delegation)
+        $(document).on("click", ".start_chat", function (e) {
+            e.preventDefault();
+            var user_id = $(this).data('user_id') || $(this).attr('data-user_id');
+            if (!user_id) return;
             $.ajax({
                 url: base_url + "chat/open_chat_box",
                 type: "get",
@@ -53,20 +116,16 @@
                         handle_error("#chat-body-errors", res.error_res);
                         return;
                     } else {
-                        if (res.exist) {
-                            var exist = 1;
-                        } else {
-                            exist = null;
-                        }
+                        var exist = res.exist ? 1 : null;
                         all_chat_messages(1, function () {
                             open_chat_box(res.chatid, exist);
                             open_chats_boxes();
-//                            calculate_popups()
                         });
                     }
                 }
             });
         });
+
         // Get open chat once page has loaded
         open_chats_boxes();
 
@@ -361,6 +420,7 @@
                 }
                 // Unique it
                 open_chats = jQuery.unique(open_chats);
+                make_chats_draggable();
             }
         });
     }

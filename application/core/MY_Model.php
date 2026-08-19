@@ -1696,26 +1696,30 @@
     function get_online_users()
     {
         $profile = profile();
+        if (empty($profile)) {
+            return array('online' => array(), 'offline' => array());
+        }
         $online['online_time'] = time();
         update('tbl_users', array('user_id' => $profile->user_id), $online);
         
-        $user_id = $profile->user_id;
-        $whereSql = null;
-        if ($profile->role_id == 2 || $profile->role_id == 3) {
+        $user_id = intval($profile->user_id);
+        $whereSql = "";
+        if ($profile->role_id == 2) {
             $whereSql = " AND tbl_users.role_id != '2' ";
         }
         
-        
-        $sql = "SELECT tbl_users.user_id, tbl_users.online_time, tbl_account_details.fullname, tbl_account_details.avatar, tbl_designations.designations
+        $sql = "SELECT tbl_users.user_id, tbl_users.online_time, 
+                       COALESCE(NULLIF(tbl_account_details.fullname, ''), tbl_users.username) AS fullname, 
+                       COALESCE(NULLIF(tbl_account_details.avatar, ''), 'assets/img/user/default_avatar.jpg') AS avatar, 
+                       COALESCE(tbl_designations.designations, 'Staff') AS designations
                 FROM tbl_users
-                LEFT JOIN tbl_account_details 	ON  tbl_users.user_id  = tbl_account_details.user_id
-                LEFT JOIN tbl_designations ON  tbl_account_details.designations_id  = tbl_designations.designations_id
-                WHERE  tbl_users.activated = '1' AND tbl_users.user_id != $user_id $whereSql ";
+                LEFT JOIN tbl_account_details ON tbl_users.user_id = tbl_account_details.user_id
+                LEFT JOIN tbl_designations ON tbl_account_details.designations_id = tbl_designations.designations_id
+                WHERE tbl_users.activated = '1' AND tbl_users.user_id != $user_id $whereSql ";
         
         $ten_sec_ago = time() - 60 * 10;
-        $sqlforOnlineUsers = " AND tbl_users.online_time > $ten_sec_ago ";
-        
-        $sqlforOfflineUsers = " AND tbl_users.online_time < $ten_sec_ago";
+        $sqlforOnlineUsers = " AND (tbl_users.online_time > $ten_sec_ago) ORDER BY tbl_users.online_time DESC ";
+        $sqlforOfflineUsers = " AND (tbl_users.online_time <= $ten_sec_ago OR tbl_users.online_time IS NULL OR tbl_users.online_time = 0 OR tbl_users.online_time = '') ORDER BY fullname ASC ";
         
         $result = array();
         $result['online'] = $this->db->query($sql . $sqlforOnlineUsers)->result();

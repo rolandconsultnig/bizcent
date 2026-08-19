@@ -32,8 +32,9 @@
         $script .= '$("#' . $window_id . '").scrollTop($("#' . $window_id . '")[0].scrollHeight);';
         ?>
         <div class="panel b0 mb0 chat_<?= $v_chat->to_user_id ?>" id="open_chat_box_<?php echo $v_chat->private_chat_id ?>">
-            <div class="panel-heading custom-bg pt-sm ">
+            <div class="panel-heading custom-bg pt-sm" style="cursor: move; user-select: none;">
                 <div class="">
+                    <i class="fa fa-arrows text-muted" style="margin-right: 4px; font-size: 10px;" title="Drag to move"></i>
                     <span class="chat_title"> <?php echo $v_chat->title ?></span>
                     <div class="pull-right chat-icon">
                         <!--                        <i data-toggle="tooltip" data-placement="top" title="-->
