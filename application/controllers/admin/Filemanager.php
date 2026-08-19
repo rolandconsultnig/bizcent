@@ -31,6 +31,10 @@ class Filemanager extends Admin_Controller
 
     public function elfinder_init()
     {
+        if (empty($_GET['cmd']) && empty($_POST['cmd']) && !$this->input->is_ajax_request()) {
+            redirect('admin/filemanager');
+            return;
+        }
         $this->ensure_filemanager_root();
         $this->load->helper('path');
         $allowed_files = $this->allowed_upload_mimes();

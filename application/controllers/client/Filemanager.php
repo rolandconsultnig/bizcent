@@ -18,6 +18,10 @@ class Filemanager extends Client_Controller
 
     public function elfinder_init()
     {
+        if (empty($_GET['cmd']) && empty($_POST['cmd']) && !$this->input->is_ajax_request()) {
+            redirect('client/filemanager');
+            return;
+        }
         $this->load->helper('path');
         $_allowed_files = explode('|', config_item('allowed_files'));
         $config_allowed_files = array();
