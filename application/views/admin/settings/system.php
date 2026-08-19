@@ -569,9 +569,13 @@ $google_api_key = config_item('google_api_key');
 
     function get_geo_data_2() {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(do_action, handle_errors);
+            navigator.geolocation.getCurrentPosition(do_action, handle_errors, {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0
+            });
         } else {
-            alert("Geolocation is not supported by this browser.");
+            alert("Geolocation (GPS/BeiDou/GLONASS) is not supported by this browser.");
         }
     }
 

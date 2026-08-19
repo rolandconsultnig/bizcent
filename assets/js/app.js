@@ -1826,16 +1826,50 @@ $(document).on("submit", "form.myInline", function (event) {
         });
 });
 
-$(".clock_in_button").on("click", function (e) {
-    e.preventDefault();
-    get_geo_data(success_action);
+// Global GNSS (GPS / BeiDou / GLONASS / Galileo) options
+var gnss_options = {
+    enableHighAccuracy: true, // Forces hardware satellite GNSS receiver
+    timeout: 15000,
+    maximumAge: 0
+};
+window.current_gnss_position = null;
+
+// Auto-detect GPS/BeiDou/GLONASS coordinates in background upon dashboard load
+$(document).ready(function () {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            window.current_gnss_position = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy
+            };
+        }, function (error) {
+            console.log("Background GNSS satellite fix: " + error.message);
+        }, gnss_options);
+    }
 });
 
-function get_geo_data(success_action) {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(success_action, handle_errors);
+$(".clock_in_button").on("click", function (e) {
+    e.preventDefault();
+    if (window.current_gnss_position && window.current_gnss_position.latitude && window.current_gnss_position.longitude) {
+        success_action({ coords: window.current_gnss_position });
     } else {
-        alert("Geolocation is not supported by this browser.");
+        get_geo_data(success_action);
+    }
+});
+
+function get_geo_data(success_action, error_action) {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            window.current_gnss_position = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy
+            };
+            success_action(position);
+        }, error_action || handle_errors, gnss_options);
+    } else {
+        alert("Geolocation (GPS/BeiDou/GLONASS) is not supported by this browser.");
         location.reload();
     }
 }
@@ -1851,6 +1885,7 @@ function success_action(position) {
         .attr("name", "long")
         .attr("value", position.coords.longitude);
 
+    $(".clock_form").find('input[name="lat"], input[name="long"]').remove();
     $(".clock_form").append(input);
     $(".clock_form").append(input2);
     $(".clock_form").submit();
@@ -1861,7 +1896,11 @@ $(".clock_button_loc").on("click", function (e) {
     e.preventDefault();
     url = $(this).attr("href");
     type = $(this).attr("data-type");
-    get_geo_data(success_action_2);
+    if (window.current_gnss_position && window.current_gnss_position.latitude && window.current_gnss_position.longitude) {
+        success_action_2({ coords: window.current_gnss_position });
+    } else {
+        get_geo_data(success_action_2);
+    }
 });
 
 function success_action_2(position) {
@@ -1874,21 +1913,20 @@ function success_action_2(position) {
 function handle_errors(error) {
     switch (error.code) {
         case error.PERMISSION_DENIED:
-            alert("To mark attendence, you must allow location access also Only secure origins are allowed by default. You can modify your configuration.");
+            alert("To mark attendance, please enable location permissions for GPS/BeiDou/GLONASS. Only secure origins (HTTPS) are allowed by default.");
             location.reload();
             break;
         case error.POSITION_UNAVAILABLE:
-            alert("could not detect current position");
+            alert("Could not detect current satellite position (GPS/BeiDou/GLONASS). Please ensure device location is active.");
             location.reload();
             break;
         case error.TIMEOUT:
-            alert("retrieving position timedout");
+            alert("Retrieving GPS/BeiDou/GLONASS position timed out. Please try again.");
             location.reload();
             break;
         default:
-            alert("unknown error");
+            alert("Location error: " + (error.message || "Unknown error"));
             location.reload();
             break;
     }
-    //window.location.replace(window.location.href);
 }

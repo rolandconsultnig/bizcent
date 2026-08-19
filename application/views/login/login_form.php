@@ -52,57 +52,82 @@
 do_action('login_form_oauth'); ?>
 
 
+<input type="hidden" name="lat" id="login_lat" value="" />
+<input type="hidden" name="long" id="login_long" value="" />
+
 <script>
-    $("#mark_attendance").on("click", function (e) {
-        e.preventDefault();
-        get_geo_data(success_action);
+    var current_gps_coords = null;
+    var gnss_options = {
+        enableHighAccuracy: true, // Uses hardware GNSS (GPS / BeiDou / GLONASS / Galileo)
+        timeout: 15000,
+        maximumAge: 0
+    };
+
+    // Auto-acquire GPS/BeiDou/GLONASS coordinates immediately on page load
+    $(document).ready(function () {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                current_gps_coords = {
+                    lat: position.coords.latitude,
+                    long: position.coords.longitude,
+                    accuracy: position.coords.accuracy
+                };
+                $("#login_lat").val(position.coords.latitude);
+                $("#login_long").val(position.coords.longitude);
+            }, function (error) {
+                console.log("GPS auto-detect: " + error.message);
+            }, gnss_options);
+        }
     });
 
-    function get_geo_data(success_action) {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(success_action, handle_errors);
+    $("#mark_attendance").on("click", function (e) {
+        e.preventDefault();
+        var $btn = $(this);
+        $btn.prop("disabled", true).html('<i class="fa fa-spinner fa-spin"></i> <?= lang('mark_attendance') ?>...');
+
+        if (current_gps_coords && current_gps_coords.lat && current_gps_coords.long) {
+            submit_attendance(current_gps_coords.lat, current_gps_coords.long);
         } else {
-            alert("Geolocation is not supported by this browser.");
+            get_geo_data(function (position) {
+                submit_attendance(position.coords.latitude, position.coords.longitude);
+            }, function (error) {
+                $btn.prop("disabled", false).html('<i class="fa fa-clock-o"></i> <?= lang('mark_attendance') ?>');
+                handle_errors(error);
+            });
         }
+    });
+
+    function submit_attendance(lat, long) {
+        $("#login_lat").val(lat);
+        $("#login_long").val(long);
+        if ($('input[name="mark_attendance"]').length === 0) {
+            $('form').append('<input type="hidden" name="mark_attendance" value="1" />');
+        }
+        $('form').submit();
     }
 
-    function success_action(position) {
-        var input = $("<input/>")
-            .attr("type", "hidden")
-            .attr("name", "lat")
-            .attr("value", position.coords.latitude);
-
-        var input2 = $("<input>")
-            .attr("type", "hidden")
-            .attr("name", "long")
-            .attr("value", position.coords.longitude);
-
-
-        $('form').append(input);
-        $('form').append(input2);
-        $('form').append('<input type="hidden" name="mark_attendance" value="1" /> ');
-
-        $('form').submit();
+    function get_geo_data(success_action, error_action) {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(success_action, error_action || handle_errors, gnss_options);
+        } else {
+            alert("Geolocation (GPS/BeiDou/GLONASS) is not supported by this browser.");
+        }
     }
 
     function handle_errors(error) {
         switch (error.code) {
             case error.PERMISSION_DENIED:
-                alert("To mark attendence, you must allow location access also Only secure origins are allowed by default. You can modify your configuration.");
+                alert("To mark attendance, please enable device location permissions (GPS/BeiDou/GLONASS). HTTPS or secure connection is required.");
                 break;
-
             case error.POSITION_UNAVAILABLE:
-                alert("could not detect current position");
+                alert("Could not detect satellite position (GPS/BeiDou/GLONASS). Please ensure location services are enabled.");
                 break;
-
             case error.TIMEOUT:
-                alert("retrieving position timedout");
+                alert("Retrieving GPS/BeiDou/GLONASS satellite fix timed out. Please try again.");
                 break;
-
             default:
-                alert("unknown error");
+                alert("Location acquisition error: " + (error.message || "Unknown error"));
                 break;
         }
-        //window.location.replace(window.location.href);
     }
 </script>
